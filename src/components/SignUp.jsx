@@ -9,7 +9,9 @@ import {
     Navigate,
     useNavigate
   } from "react-router-dom";
-import DisplayRecommendations from './DisplayRecommendations';
+import DisplayRecommendations from './DisplayRecommendations.jsx';
+import './SignUp.css';
+import { Component } from 'react';
   
 
   
@@ -31,15 +33,25 @@ import DisplayRecommendations from './DisplayRecommendations';
 
     return (
             <>
-            <form>
+            <div>
+                <ul>
+                    <li>Song Search</li>
+                </ul>
+            </div>
+            <div class="center">
+                <form >
 
-                <input
-                    placeholder='Please input your email'
-                    type="text" 
-                    name="usernsame"
-                    onChange={handleChange}
-                />
-            </form><button onClick={handleSubmit}> Submit</button>
+                    <input
+                        placeholder='Please input your email'
+                        type="text" 
+                        name="usernsame"
+                        onChange={handleChange}
+                    />
+                </form>
+            </div>
+            <div>
+                <button onClick={handleSubmit}> Submit</button>
+            </div>
         </>
     )
 

@@ -9,6 +9,7 @@ import {
     Route,
     Navigate,
   } from "react-router-dom";
+import './DisplayRecommendations.css';
   
 
 export class DisplayRecommendations extends React.Component {
@@ -39,27 +40,41 @@ export class DisplayRecommendations extends React.Component {
     render() {
         return (
             <>
-            <div> 
-                <input placeholder="Enter Song Title or Artist name"/>
-                <h2>Results of search (drop down menu):</h2>
-                <div>
-                    
-
-                </div>
+            <div>
+                <ul>
+                    <li>Song Search</li>
+                </ul>
             </div>
 
-            <div>
-                <h2>Liked Songs:</h2>
-                <div>
 
+            <div >
+                <div class="search" > 
+                    <form>
+                        <input
+                            placeholder="Enter Song Title or Artist name"
+                            type="text" 
+                            name="usernsame"
+                        />
+                    </form>
+                    <div>
+                    </div>
                 </div>
-            </div>
 
-            <div>
-                <h2>Recommendations: </h2>
-                <div>
+                <div class="display">
+                    <div >
+                            <h2>Liked Songs:</h2>
+                            <div>
 
-                </div>
+                            </div>
+                        </div>
+
+                        <div >
+                            <h2>Recommendations: </h2>
+                            <div>
+
+                            </div>
+                        </div>
+                    </div>
             </div>
             </>
         )

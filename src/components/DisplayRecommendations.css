@@ -29,3 +29,9 @@ ul {
     width: 80%;
     background: #f1f1f1;
 }
+
+.list{
+    top: 20%;
+    height: 100px;
+    overflow: scroll;
+}

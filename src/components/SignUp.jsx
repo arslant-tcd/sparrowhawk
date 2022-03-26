@@ -1,36 +1,40 @@
-import React from 'react';
-import ReactDOM, { render } from 'react-dom';
-import App from '../App';
-import reportWebVitals from '../reportWebVitals';
+import React, { useState } from "react";
 import {
-    BrowserRouter as Router,
-    Routes,
-    Route,
-    Navigate,
     useNavigate
   } from "react-router-dom";
-import DisplayRecommendations from './DisplayRecommendations.jsx';
 import './SignUp.css';
-import { Component } from 'react';
+import axios from "axios";
   
-
   
  const SignUp = () => {
 
+    const [email, setEmail] = useState("");
+
+    const addUser = async (userInput) => {
+
+        axios
+        .post("http://127.0.0.1:5000/addUser", {"email": userInput})
+        .then(res => {
+        if(res.data['status code'] === "200"){
+            console.log(userInput)
+        }
+        }).catch((error) => {
+        //this.setState({errorMessage: error.message})
+            console.log(userInput)
+        });
+        
+    }
 
     const navigate = useNavigate();
 
-    const handleSubmit = () => {
-       navigate("/test");
-    }
-
-    const handleChange = ({target}) => {
-        this.setState({
-            userInput: target.value
-        })
+    const handleSubmit = (event) => {
+        console.log({email})
+        addUser({email});
+        navigate("/test");
     }
 
 
+    
     return (
             <>
             <div>
@@ -38,14 +42,15 @@ import { Component } from 'react';
                     <li>Song Search</li>
                 </ul>
             </div>
-            <div class="center">
+            <div className="center">
                 <form >
 
                     <input
                         placeholder='Please input your email'
                         type="text" 
                         name="usernsame"
-                        onChange={handleChange}
+                        value={email}
+                        onChange={e => setEmail(e.target.value)}
                     />
                 </form>
             </div>

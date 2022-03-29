@@ -1,5 +1,7 @@
 from flask import Flask, jsonify, request
 from flask_pymongo import PyMongo
+from flask_cors import cross_origin
+
 
 app = Flask(__name__)
 
@@ -16,9 +18,12 @@ def getUsers():
     for u in user.find():
         print(u)
         op.append({'email' : u['mail']})
-    return jsonify({'results' : op})
+    response = jsonify({'results' : op})
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    return response
 
 @app.route('/addUser', methods=['POST'])
+@cross_origin()
 def addUsers():
     user = mongo.db.user
     content = request.get_json(force=True)
@@ -36,7 +41,10 @@ def getDataByArtist():
     for data in user.find():
         
         op.append({'mode': data['mode'],'count': data['count'],'acousticness': data['acousticness'],'artists': data['artists'],'danceability': data['danceability'],'duration_ms': data['duration_ms'],'energy': data['energy'],'instrumentalness': data['instrumentalness'],'liveness': data['liveness'],'loudness': data['loudness'],'speechiness': data['speechiness'],'tempo': data['tempo'],'valence': data['valence'],'popularity': data['popularity'],'key': data['key']})
-    return jsonify({'results' : op})
+    response = jsonify({'results' : op})
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    return response
+
 
 @app.route('/getDataByGenres', methods=['GET'])
 def getDataByGenres():
@@ -46,7 +54,9 @@ def getDataByGenres():
     for data in user.find():
         
         op.append({'mode':data['mode'],'genres':data['genres'],'acousticness':data['acousticness'],'danceability':data['danceability'],'duration_ms':data['duration_ms'],'energy':data['energy'],'instrumentalness':data['instrumentalness'],'liveness':data['liveness'],'loudness':data['loudness'],'speechiness':data['speechiness'],'tempo':data['tempo'],'valence':data['valence'],'popularity':data['popularity'],'key':data['key']})
-    return jsonify({'results' : op})
+    response = jsonify({'results' : op})
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    return response
 
 @app.route('/getDataByYear', methods=['GET'])
 def getDataByYear():
@@ -56,7 +66,9 @@ def getDataByYear():
     for data in user.find():
         
         op.append({'mode':data['mode'],'year':data['year'],'acousticness':data['acousticness'],'danceability':data['danceability'],'duration_ms':data['duration_ms'],'energy':data['energy'],'instrumentalness':data['instrumentalness'],'liveness':data['liveness'],'loudness':data['loudness'],'speechiness':data['speechiness'],'tempo':data['tempo'],'valence':data['valence'],'popularity':data['popularity'],'key':data['key']})
-    return jsonify({'results' : op})
+    response = jsonify({'results' : op})
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    return response
 
 @app.route('/getDataWGenre', methods=['GET'])
 def getDataWGenre():
@@ -66,7 +78,9 @@ def getDataWGenre():
     for data in user.find():
         
         op.append({'genres':data['genres'],'artists':data['artists'],'acousticness':data['acousticness'],'danceability':data['danceability'],'duration_ms':data['duration_ms'],'energy':data['energy'],'instrumentalness':data['instrumentalness'],'liveness':data['liveness'],'loudness':data['loudness'],'speechiness':data['speechiness'],'tempo':data['tempo'],'valence':data['valence'],'popularity':data['popularity'],'key':data['key'],'mode':data['mode'],'count':data['count']})
-    return jsonify({'results' : op})
+    response = jsonify({'results' : op})
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    return response
 
 @app.route('/getMusic', methods=['GET'])
 def getMusic():
@@ -76,7 +90,9 @@ def getMusic():
     for data in user.find():
         
         op.append({'valence':data['valence'],'year':data['year'],'acousticness':data['acousticness'],'artists':data['artists'],'danceability':data['danceability'],'duration_ms':data['duration_ms'],'energy':data['energy'],'explicit':data['explicit'],'id':data['id'],'instrumentalness':data['instrumentalness'],'key':data['key'],'liveness':data['liveness'],'loudness':data['loudness'],'mode':data['mode'],'name':data['name'],'popularity':data['popularity'],'release_date':data['release_date'],'speechiness':data['speechiness'],'tempo':data['tempo']})
-    return jsonify({'results' : op})
+    response = jsonify({'results' : op})
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    return response
 
 if __name__ == '__main__':
     app.run()

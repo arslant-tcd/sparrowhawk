@@ -18,9 +18,11 @@ class Knn:
         music=GetMusic()
         input_data=music.get()
 
-        print(input_data)
-        
         df = input_data
+        df.to_csv('test.csv')
+        df = df.convert_dtypes()
+        num_cols = ['valence','year','acousticness','danceability','duration_ms','energy','explicit','instrumentalness','key','liveness','loudness','mode','popularity','speechiness','tempo']
+        df[num_cols] =df[num_cols].apply(pd.to_numeric)
         df_num = df.select_dtypes(include=[np.number])
 
         print(df_num.columns)
@@ -55,4 +57,5 @@ class Knn:
         #print(df_num.loc[df_num["Cluster"]==closest_centroid].sample(5))
 
         df['Cluster'] = kmeans_model.labels_
-        print(df.loc[df["Cluster"]==closest_centroid].sample(5))
+        result = df.loc[df["Cluster"]==closest_centroid].sample(5)
+        print(result)

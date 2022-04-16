@@ -99,6 +99,18 @@ def getMusic():
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
 
+@app.route('/getYears', methods=['GET'])
+def getYears():
+    user = mongo.db.music
+    op = []
+
+    for data in user.distinct("year"):
+        print(data)
+        # op.append({'valence':data['valence'],'year':data['year'],'acousticness':data['acousticness'],'artists':data['artists'],'danceability':data['danceability'],'duration_ms':data['duration_ms'],'energy':data['energy'],'explicit':data['explicit'],'id':data['id'],'instrumentalness':data['instrumentalness'],'key':data['key'],'liveness':data['liveness'],'loudness':data['loudness'],'mode':data['mode'],'name':data['name'],'popularity':data['popularity'],'release_date':data['release_date'],'speechiness':data['speechiness'],'tempo':data['tempo']})
+    response = jsonify({'results' : op})
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    return response
+
 @app.route('/recommend', methods=['POST'])
 @cross_origin()
 def recommend():
@@ -108,6 +120,8 @@ def recommend():
     response = jsonify({'results' : op})
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
+
+
 
 def predict(id):
         #importing data from csv file

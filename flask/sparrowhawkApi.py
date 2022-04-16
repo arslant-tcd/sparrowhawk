@@ -111,12 +111,33 @@ def getYears():
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
 
-@app.route('/recommend', methods=['POST'])
+@app.route('/recommend/<id>', methods=['GET'])
 @cross_origin()
-def recommend():
-    content = request.get_json(force=True)
+def recommend(id):
+    # content = request.get_json(force=True)
     print(content['id'])
-    op = predict(content['id'])
+    op = predict(id)
+    response = jsonify({'results' : op})
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    return response
+
+@app.route('/getFormSuggestions', methods=['GET'])
+# @cross_origin()
+def getFormSuggestions():
+    op ={}
+    df = pd.read_csv('test.csv')    
+    cj = df.sample(n = 6)
+    op['songs']=cj[['id','name']].to_dict()
+    print(op)
+    cj = df.sample(n = 6)
+    artists =[]
+    for i in cj['artists']:
+        tmp = i.replace("\'", "$")
+        artists.append(tmp.split('$')[1])
+        # print(tmp.split('$'))
+        # print(list(i)[0])
+    # print(artists)
+    op['artists'] = artists
     response = jsonify({'results' : op})
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response

@@ -68,10 +68,12 @@ def getDataWGenre():
         op.append({'genres':data['genres'],'artists':data['artists'],'acousticness':data['acousticness'],'danceability':data['danceability'],'duration_ms':data['duration_ms'],'energy':data['energy'],'instrumentalness':data['instrumentalness'],'liveness':data['liveness'],'loudness':data['loudness'],'speechiness':data['speechiness'],'tempo':data['tempo'],'valence':data['valence'],'popularity':data['popularity'],'key':data['key'],'mode':data['mode'],'count':data['count']})
     return jsonify({'results' : op})
 
-@app.route('/getBasedOnGenre/<string:genre_type>', methods=['GET'])
+@app.route('/getBasedOnGenre', defaults={'genre_type':'ACDC'})
+@app.route('/getBasedOnGenre/<genre_type>', methods=['GET'])
 def getBasedOnGenre(genre_type):
+    print(genre_type)
     user = mongo.db.dataWGenres
-    all_data=user.find({"genres": genre_type})
+    all_data=user.find({"genres" : {'$regex': genre_type}})
     op = []
 
     for data in all_data:    

@@ -1,6 +1,11 @@
 from flask import Flask, jsonify, request
 from flask_pymongo import PyMongo
 from flask_cors import cross_origin
+import pickle
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.cluster import KMeans
+import numpy as np
+import pandas as pd
 
 
 app = Flask(__name__)
@@ -93,6 +98,71 @@ def getMusic():
     response = jsonify({'results' : op})
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
+
+@app.route('/recommend', methods=['POST'])
+@cross_origin()
+def recommend():
+    content = request.get_json(force=True)
+    print(content['id'])
+    op = predict(content['id'])
+    response = jsonify({'results' : op})
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    return response
+
+def predict(id):
+        #importing data from csv file
+        # music=GetMusic()
+        # input_data=music.get()
+
+        # df = input_data
+        # df.to_csv('test.csv')
+        df = pd.read_csv('test.csv')
+        num_cols = ['valence','year','acousticness','danceability','duration_ms','energy','explicit','instrumentalness','key','liveness','loudness','mode','popularity','speechiness','tempo']
+        df[num_cols] =df[num_cols].apply(pd.to_numeric)
+        df_num = df.select_dtypes(include=[np.number])
+
+        # print(df_num.columns)
+
+        # kmeans_model = KMeans(20,init='k-means++')
+        # kmeans_model.fit(df_num)
+        with open('model_pickle','rb') as f:
+            kmeans_model = pickle.load(f)
+
+        df_num['Cluster'] = kmeans_model.labels_
+
+        df_num.head()
+
+        # song_id = "7xPhfUan2yNtyFG0cUWkt8"
+        #["7xPhfUan2yNtyFG0cUWkt8","4BZXVFYCb76Q0Klojq4piV"]
+        d1 = df.loc[df["id"]==id]
+        d1_num = d1.select_dtypes(include=[np.number])
+        d1_num = d1_num.loc[:, ~d1_num.columns.str.contains('^Unnamed')]
+        # print(d1_num[0][1:])
+        #result = kmeans_model.fit_predict(d1_num)
+        cluster_pts = kmeans_model.cluster_centers_
+        cluster_pts.shape
+
+        distances = []
+        # print(np.sum((d1_num - center) ** 2))
+        for center in cluster_pts:
+            
+            # print(d1_num.shape)
+            distances.append(np.sum((d1_num - center) ** 2))                
+        distances = np.reshape(distances, cluster_pts.shape)
+
+        dist = distances.sum(axis=1)
+        print(dist)
+
+        closest_centroid = np.argmin(dist)
+        print("Cluster is ",closest_centroid)
+
+        #print(df_num.loc[df_num["Cluster"]==closest_centroid].sample(5))
+
+        df['Cluster'] = kmeans_model.labels_
+        result = df.loc[df["Cluster"]==closest_centroid].sample(5)
+        result = result.loc[:, ~result.columns.str.contains('^Unnamed')]
+        print(result.to_json())
+        return result.to_dict()
 
 if __name__ == '__main__':
     app.run()

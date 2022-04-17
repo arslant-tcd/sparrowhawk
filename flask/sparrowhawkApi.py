@@ -33,9 +33,22 @@ def addUsers():
     user = mongo.db.user
     content = request.get_json(force=True)
     print(content)
-    id = user.insert_one({'mail':content['email']})
-    
-    return jsonify({'email' : content['email']})
+    id = user.insert_one({'email':content['email']})
+    # print(str(id))
+    data = user.find({'email':content['email']})
+    print(data[0]['_id'])
+    id = data[0]['_id']
+    return jsonify({'id' : str(id)})
+
+@app.route('/getUserId/<mil>', methods=['GET'])
+@cross_origin()
+def getUserId(mil):
+    user = mongo.db.user
+    # content = request.get_json(force=True)
+    # print(content)
+    data = user.find({'email':mil})    
+    id = data[0]['_id']
+    return jsonify({'id' : str(id)})
     
 
 @app.route('/getDataByArtist', methods=['GET'])
@@ -115,7 +128,7 @@ def getYears():
 @cross_origin()
 def recommend(id):
     # content = request.get_json(force=True)
-    print(content['id'])
+    print(id)
     op = predict(id)
     response = jsonify({'results' : op})
     response.headers.add("Access-Control-Allow-Origin", "*")
@@ -142,6 +155,26 @@ def getFormSuggestions():
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
 
+@app.route('/getFormData', methods=['GET'])
+# @cross_origin()
+def getFormData():
+    op ={}
+    df = pd.read_csv('test.csv')    
+    cj = df.sample(n = 6)
+    op['songs']=cj[['id','name']].to_dict()
+    print(op)
+    cj = df.sample(n = 6)
+    artists =[]
+    for i in cj['artists']:
+        tmp = i.replace("\'", "$")
+        artists.append(tmp.split('$')[1])
+        # print(tmp.split('$'))
+        # print(list(i)[0])
+    # print(artists)
+    op['artists'] = artists
+    response = jsonify({'results' : op})
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    return response
 
 
 def predict(id):

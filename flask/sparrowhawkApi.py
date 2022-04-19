@@ -30,9 +30,10 @@ def getUsers():
 @app.route('/addUser', methods=['POST'])
 @cross_origin()
 def addUsers():
+    likedSongs = []
     user = mongo.db.user
     content = request.get_json(force=True)
-    print(content)
+    # print(content)
     id = user.insert_one({'email':content['email']})
     # print(str(id))
     data = user.find({'email':content['email']})
@@ -50,6 +51,27 @@ def getUserId(mil):
     id = data[0]['_id']
     return jsonify({'id' : str(id)})
     
+@app.route('/addLikedSong/', methods=['PUT'])
+@cross_origin()
+def addLikedSong():
+    user = mongo.db.user
+    content = request.get_json(force=True)
+    print(content)
+    print(type(content['song']))
+    result = user.update_one({'email': content['id']}, {'$push': {'likedSongs': content['song']}})
+    # data = user.find({'email':mil})    
+    # id = data[0]['_id']
+    return jsonify({'success' : "200"})
+
+@app.route('/getLikedSongs/<mil>', methods=['GET'])
+@cross_origin()
+def getLikedSongs(mil):
+    user = mongo.db.user
+    # content = request.get_json(force=True)
+    # print(content)
+    data = user.find({'email':mil})    
+    id = data[0]['likedSongs']
+    return jsonify({'likedSongs' : id})
 
 @app.route('/getDataByArtist', methods=['GET'])
 def getDataByArtist():

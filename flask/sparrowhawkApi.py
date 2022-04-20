@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 from flask_pymongo import PyMongo
 from flask_cors import cross_origin
 import pickle
+import pymongo
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.cluster import KMeans
 import numpy as np
@@ -94,6 +95,19 @@ def getDataByGenres():
     for data in user.find():
         
         op.append({'mode':data['mode'],'genres':data['genres'],'acousticness':data['acousticness'],'danceability':data['danceability'],'duration_ms':data['duration_ms'],'energy':data['energy'],'instrumentalness':data['instrumentalness'],'liveness':data['liveness'],'loudness':data['loudness'],'speechiness':data['speechiness'],'tempo':data['tempo'],'valence':data['valence'],'popularity':data['popularity'],'key':data['key']})
+    response = jsonify({'results' : op})
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    return response
+
+
+@app.route('/recommendByPopularity', methods=['GET'])
+def recommendByPopularity():
+    main_data = mongo.db.music
+    op = []
+
+    for data in main_data.find().sort('popularity',pymongo.DESCENDING).limit(10):
+        op.append({'valence':data['valence'],'year':data['year'],'acousticness':data['acousticness'],'artists':data['artists'],'danceability':data['danceability'],'duration_ms':data['duration_ms'],'energy':data['energy'],'explicit':data['explicit'],'id':data['id'],'instrumentalness':data['instrumentalness'],'key':data['key'],'liveness':data['liveness'],'loudness':data['loudness'],'mode':data['mode'],'name':data['name'],'popularity':data['popularity'],'release_date':data['release_date'],'speechiness':data['speechiness'],'tempo':data['tempo']})
+    
     response = jsonify({'results' : op})
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response

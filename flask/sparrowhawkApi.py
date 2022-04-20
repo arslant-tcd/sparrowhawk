@@ -1,13 +1,13 @@
 from flask import Flask, jsonify, request
 from flask_pymongo import PyMongo
 from flask_cors import cross_origin
+from bson import ObjectId
 import pickle
 import pymongo
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.cluster import KMeans
 import numpy as np
 import pandas as pd
-
 
 app = Flask(__name__)
 
@@ -86,7 +86,6 @@ def getDataByArtist():
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
 
-
 @app.route('/getDataByGenres', methods=['GET'])
 def getDataByGenres():
     user = mongo.db.dataByGenres
@@ -98,7 +97,6 @@ def getDataByGenres():
     response = jsonify({'results' : op})
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
-
 
 @app.route('/recommendByPopularity', methods=['GET'])
 def recommendByPopularity():
@@ -153,14 +151,28 @@ def getBasedOnGenreType(genre_type):
             op.append({'genres':data['genres'],'artists':data['artists'],'acousticness':data['acousticness'],'danceability':data['danceability'],'duration_ms':data['duration_ms'],'energy':data['energy'],'instrumentalness':data['instrumentalness'],'liveness':data['liveness'],'loudness':data['loudness'],'speechiness':data['speechiness'],'tempo':data['tempo'],'valence':data['valence'],'popularity':data['popularity'],'key':data['key'],'mode':data['mode'],'count':data['count']})
     return jsonify({'results' : op})
 
+@app.route('/getSpecificSong', defaults={'song_id':'ACDC'})
+@app.route('/getSpecificSong/<song_id>', methods=['GET'])
+def getSpecificSong(song_id):
+    print(song_id)
+    user = mongo.db.music 
+    all_data=user.find({"_id" : ObjectId(str(song_id))})
+    print(all_data)
+    op = []
+
+    for data in all_data:
+        op.append({'valence':data['valence'],'year':data['year'],'acousticness':data['acousticness'],'artists':data['artists'],'danceability':data['danceability'],'duration_ms':data['duration_ms'],'energy':data['energy'],'explicit':data['explicit'],'id':data['id'],'instrumentalness':data['instrumentalness'],'key':data['key'],'liveness':data['liveness'],'loudness':data['loudness'],'mode':data['mode'],'name':data['name'],'popularity':data['popularity'],'release_date':data['release_date'],'speechiness':data['speechiness'],'tempo':data['tempo']})
+
+    return jsonify({'results' : op})    
+
 @app.route('/getMusic', methods=['GET'])
 def getMusic():
     user = mongo.db.music
     op = []
 
     for data in user.find():
-        
         op.append({'valence':data['valence'],'year':data['year'],'acousticness':data['acousticness'],'artists':data['artists'],'danceability':data['danceability'],'duration_ms':data['duration_ms'],'energy':data['energy'],'explicit':data['explicit'],'id':data['id'],'instrumentalness':data['instrumentalness'],'key':data['key'],'liveness':data['liveness'],'loudness':data['loudness'],'mode':data['mode'],'name':data['name'],'popularity':data['popularity'],'release_date':data['release_date'],'speechiness':data['speechiness'],'tempo':data['tempo']})
+    
     response = jsonify({'results' : op})
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
@@ -228,7 +240,6 @@ def getFormData():
     response = jsonify({'results' : op})
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
-
 
 def predict(id):
         #importing data from csv file

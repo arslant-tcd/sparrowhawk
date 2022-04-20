@@ -136,6 +136,23 @@ def getDataWGenre():
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
 
+@app.route('/getBasedOnGenreType', defaults={'genre_type':'ACDC'})
+@app.route('/getBasedOnGenreType/<genre_type>', methods=['GET'])
+def getBasedOnGenreType(genre_type):
+    print(genre_type)
+    user = mongo.db.dataWGenres
+    all_data=user.find({"genres" : {'$regex': genre_type}})
+    op = []
+
+    for data in all_data:    
+        
+        if(data['artists'] == "$NOT" or data['artists'] == ""):
+            continue
+        else:
+            
+            op.append({'genres':data['genres'],'artists':data['artists'],'acousticness':data['acousticness'],'danceability':data['danceability'],'duration_ms':data['duration_ms'],'energy':data['energy'],'instrumentalness':data['instrumentalness'],'liveness':data['liveness'],'loudness':data['loudness'],'speechiness':data['speechiness'],'tempo':data['tempo'],'valence':data['valence'],'popularity':data['popularity'],'key':data['key'],'mode':data['mode'],'count':data['count']})
+    return jsonify({'results' : op})
+
 @app.route('/getMusic', methods=['GET'])
 def getMusic():
     user = mongo.db.music

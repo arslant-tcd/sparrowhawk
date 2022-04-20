@@ -33,13 +33,21 @@ def addUsers():
     likedSongs = []
     user = mongo.db.user
     content = request.get_json(force=True)
+    data = user.countDocuments({'email':content['email']})
+    # if()
+    print(data[0])
+    if(data == 0):
+        id = user.insert_one({'email':content['email']})
+        return jsonify({'id' : str(id),'status code':"200", 'message':"User Added successfully"})
+    else:
+        return jsonify({'status':"200","message":"User Already exists"})
     # print(content)
-    id = user.insert_one({'email':content['email']})
+    
     # print(str(id))
-    data = user.find({'email':content['email']})
+    
     print(data[0]['_id'])
     id = data[0]['_id']
-    return jsonify({'id' : str(id)})
+    
 
 @app.route('/getUserId/<mil>', methods=['GET'])
 @cross_origin()

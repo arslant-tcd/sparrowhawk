@@ -1,3 +1,8 @@
+.body {
+    padding-bottom: 5px;
+}
+
+
 ul {
     list-style-type: none;
     margin: 0;
@@ -14,7 +19,7 @@ ul {
 
 .display {
     position: absolute;
-    top: 20%;
+    top: 50%;
     left: 10%;
     transform: translateY(-50%);
 }
@@ -31,7 +36,7 @@ ul {
 }
 
 .list{
-    top: 20%;
-    height: 100px;
+    height: 200px;
     overflow: scroll;
+    margin: auto;
 }

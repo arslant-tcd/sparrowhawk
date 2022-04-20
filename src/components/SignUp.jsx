@@ -13,13 +13,15 @@ class SignUp extends React.Component{
         }
     }
 
+    // Send the email to the addUser API and then trigger the parentCallbak function to change state and component in App.js
     addUser = async (userInput) => {
 
         axios
-        .post("http://127.0.0.1:5000/addUser", {"email": userInput})
+        .post("http://127.0.0.1:5000/addUser", {email: userInput})
         .then(res => {
         if(res.data['status code'] === "200"){
             console.log(userInput)
+            this.props.parentCallback(res.data.isPresent)
         }
         }).catch((error) => {
         //this.setState({errorMessage: error.message})
@@ -28,7 +30,8 @@ class SignUp extends React.Component{
         
     }
 
-    handleSubmit = (event) => {
+    // Update the email that the user has inputted
+    handleSubmit = () => {
        // console.log({email})
         this.addUser(this.state.email);
     }

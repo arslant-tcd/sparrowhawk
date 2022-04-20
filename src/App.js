@@ -18,13 +18,22 @@ class App extends React.Component {
   }
 
 
-  handleCallback = () => {
+  handleCallback = (isUserPresent) => {
 
-    this.setState({
-      form: true,
-      signIn: true
-
-    })
+    if(isUserPresent === true){
+      this.setState({
+        form: true,
+        signIn: true
+  
+      })
+    }
+    else{
+      this.setState({
+        form: false,
+        signIn: true
+  
+      })
+    }
   }
 
   // Handle submits so that existing user is directed to the display recommendations

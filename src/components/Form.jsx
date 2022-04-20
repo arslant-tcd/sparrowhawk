@@ -1,34 +1,67 @@
 import React, { useState } from "react";
 import '../style/SignUp.css';
 import axios from "axios";
+import { render } from "@testing-library/react";
+import '../style/Form.css'
   
-
 
  // Form to display random songs, artists, genres and decades 
  // User will choose preference giving model specific data to user
- const Form = () => {
-    const steps = [];
-    for (let i = 1; i <= 5; i++) {
-        steps.push(<button key={i}>Song</button>);
+ class Form extends React.Component {
+    
+    constructor(props){
+        super(props)
+        this.state = {
+            songs: [],
+            artists: []
+        }
+    }
+
+    // Call API to fetch the song and artists that the user will choose from
+    populateSuggestions = async () => {
+
+        axios
+        .post("http://127.0.0.1:5000/getFormSuggestions", {email: userInput})
+        .then(res => {
+        if(res.data['status code'] === "200"){
+            console.log(userInput)
+            this.props.parentCallback(res.data.isPresent)
+        }
+        }).catch((error) => {
+        //this.setState({errorMessage: error.message})
+            console.log(userInput)
+        });
+        
     }
     
-    return (
-            <>
-            <div>
-                <ul>
-                    <li>Song Search</li>
-                </ul>
-            </div>
-            <div>
+    componentDidMount = () => {
+        this.populateSuggestions();
+    }
+
+    // When artist and song are selected, send Artist and Song ID to backend and update state variables
+    handleSubmit = () => {
+        this.props.parentCallback()
+    }
+    
+
+    render(){
+        return (
+                <>
                 <div>
-                    <div> {steps}</div>
-                    <button> Submit</button>
+                    <ul>
+                        <li>Song Search</li>
+                    </ul>
                 </div>
-                
-            </div>
-        </>
-    )
+                <div>
+                    <div>
+                        <div> {steps}</div>
+                        <button> Submit</button>
+                    </div>
+                    
+                </div>
+            </>
+        )
+    }
+}
 
-  }
-
-  export default Form;
+export default Form;

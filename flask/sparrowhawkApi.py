@@ -31,14 +31,15 @@ def getUsers():
 @cross_origin()
 def addUsers():
     likedSongs = []
+    
     user = mongo.db.user
     content = request.get_json(force=True)
-    data = user.countDocuments({'email':content['email']})
+    data = user.count_documents({'email':content['email']})
     # if()
-    print(data[0])
+    # print(data[0])
     if(data == 0):
-        id = user.insert_one({'email':content['email']})
-        return jsonify({'id' : str(id),'status code':"200", 'message':"User Added successfully"})
+        user.insert_one({'email':content['email']})
+        return jsonify({'status code':"200", 'message':"User Added successfully"})
     else:
         return jsonify({'status':"200","message":"User Already exists"})
     # print(content)
@@ -64,12 +65,30 @@ def getUserId(mil):
 def addLikedSong():
     user = mongo.db.user
     content = request.get_json(force=True)
-    print(content)
-    print(type(content['song']))
-    result = user.update_one({'email': content['id']}, {'$push': {'likedSongs': content['song']}})
+    # print(content)
+    # print(type(content['song']))
+    
+    result = user.find({'email': content['email']})
+    # print(result[0])
+    for i in result:
+        print("op")
+        print(i)
+        key ="likedSongs"
+        if(key not in content.keys()):
+            df = pd.read_csv('test.csv')
+            print()
+            data = df[df['id'] == list(content['song'].keys())[0]].iloc[0]
+            print(data)
+            result = user.update_one({'email': content['email']}, {'$push': {'likedSongs': content['song']}})
+            result = user.update_one({'email': content['email']}, {'$set':{'avg_valence':data['valence'],'avg_acousticness':data['acousticness'],'avg_danceability':data['danceability'],'avg_energy':data['energy'],'avg_instrumentalness':data['instrumentalness'],'avg_liveness':data['liveness'],'avg_loudness':data['loudness'],'avg_speechiness':data['speechiness'],'avg_tempo':data['tempo']}})
+        else:
+            # weighted average code
+            result = user.update_one({'email': content['email']}, {'$set':{'avg_valence':data['valence'],'avg_acousticness':data['acousticness'],'avg_danceability':data['danceability'],'avg_energy':data['energy'],'avg_instrumentalness':data['instrumentalness'],'avg_liveness':data['liveness'],'avg_loudness':data['loudness'],'avg_speechiness':data['speechiness'],'avg_tempo':data['tempo']}})
     # data = user.find({'email':mil})    
     # id = data[0]['_id']
-    return jsonify({'success' : "200"})
+    response = jsonify({'status code' : "200"})
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    return response
 
 @app.route('/getLikedSongs/<mil>', methods=['GET'])
 @cross_origin()
@@ -79,7 +98,9 @@ def getLikedSongs(mil):
     # print(content)
     data = user.find({'email':mil})    
     id = data[0]['likedSongs']
-    return jsonify({'likedSongs' : id})
+    response = jsonify({'likedSongs' : id,'status code':"200"})
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    return response
 
 @app.route('/getDataByArtist', methods=['GET'])
 def getDataByArtist():
@@ -185,23 +206,26 @@ def getFormSuggestions():
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
 
-@app.route('/getFormData', methods=['GET'])
+@app.route('/setPreferences', methods=['PUT'])
 # @cross_origin()
-def getFormData():
-    op ={}
-    df = pd.read_csv('test.csv')    
-    cj = df.sample(n = 6)
-    op['songs']=cj[['id','name']].to_dict()
-    print(op)
-    cj = df.sample(n = 6)
-    artists =[]
-    for i in cj['artists']:
-        tmp = i.replace("\'", "$")
-        artists.append(tmp.split('$')[1])
-        # print(tmp.split('$'))
-        # print(list(i)[0])
-    # print(artists)
-    op['artists'] = artists
+def setPreferences():
+    content = request.get_json(force=True)
+    print(content)
+
+    # op ={}
+    # df = pd.read_csv('test.csv')    
+    # cj = df.sample(n = 6)
+    # op['songs']=cj[['id','name']].to_dict()
+    # print(op)
+    # cj = df.sample(n = 6)
+    # artists =[]
+    # for i in cj['artists']:
+    #     tmp = i.replace("\'", "$")
+    #     artists.append(tmp.split('$')[1])
+    #     # print(tmp.split('$'))
+    #     # print(list(i)[0])
+    # # print(artists)
+    # op['artists'] = artists
     response = jsonify({'results' : op})
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response

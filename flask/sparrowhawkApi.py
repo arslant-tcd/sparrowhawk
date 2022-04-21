@@ -286,17 +286,22 @@ def setPreferences():
 
 def predict(user_id):
         #importing clustered data from csv file
-        data = pd.read_csv('kmeans_result.csv')
+        data = pd.read_csv('kmeans_result.csv',index_col=False)
         num_cols = ['valence','year','acousticness','danceability','duration_ms','energy','instrumentalness','liveness','loudness','speechiness','tempo']
         data[num_cols] =data[num_cols].apply(pd.to_numeric)
 
         user = mongo.db.user
         result = pd.DataFrame(user.find({'email': user_id}))
         data["diff"]=999.999
-        data["diff"]=(data["valence"]- result["avg_valence"])+(data["acousticness"]- result["avg_acousticness"])+(data["danceability"]- result["avg_danceability"])+(data["energy"]- result["avg_energy"])+(data["instrumentalness"]- result["avg_instrumentalness"])+(data["liveness"]- result["avg_liveness"])+(data["loudness"]- result["avg_loudness"])+(data["speechiness"]- result["avg_speechiness"])+(data["tempo"]- result["avg_tempo"])
+        for i in result:
+            print("Result... ",i,"  Value...  ",result[i])
+        data["diff"]=abs(data["valence"]- result["avg_valence"][0])+abs(data["acousticness"]- result["avg_acousticness"][0])+abs(data["danceability"]- result["avg_danceability"][0])+abs(data["energy"]- result["avg_energy"][0])+abs(data["instrumentalness"]- result["avg_instrumentalness"][0])+abs(data["liveness"]- result["avg_liveness"][0])+abs(data["loudness"]- result["avg_loudness"][0])+abs(data["speechiness"]- result["avg_speechiness"][0])+abs(data["tempo"]- result["avg_tempo"][0])
         # print("Data columns... ",data.columns)
-        data.sort_values(by=['diff', 'popularity'], ascending=[True, False])
-        closest_cluster = data.iloc[0]['Cluster']
+        data.sort_values(by=['diff'], ascending=[True])
+        # print("Data head.. ",data.head())
+        # print("Min diff..  ",data['diff'].min())
+        # print("Min Cluster... ",np.array(data[data['diff'] == data['diff'].min()]['Cluster'].sample(1)))
+        closest_cluster = data[data['diff'] == data['diff'].min()]['Cluster'].sample(1).values[0]
 
         result = data.loc[data["Cluster"]==closest_cluster].sample(5)
         print(result.to_json())

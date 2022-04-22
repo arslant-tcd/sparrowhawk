@@ -3,6 +3,7 @@ import React from 'react';
 import SignUp from './components/SignUp';
 import DisplayRecommendations from './components/DisplayRecommendations';
 import Form from './components/Form';
+import { toHaveDisplayValue } from '@testing-library/jest-dom/dist/matchers';
 
 
 class App extends React.Component {
@@ -22,14 +23,14 @@ class App extends React.Component {
 
     if(isUserPresent === true){
       this.setState({
-        form: true,
+        form: false,
         signIn: true
   
       })
     }
     else{
       this.setState({
-        form: false,
+        form: true,
         signIn: true
   
       })
@@ -43,7 +44,7 @@ class App extends React.Component {
     return (
            
       <div>
-        { this.state.form === false && this.state.signIn === false && < SignUp />}
+        { this.state.form === false && this.state.signIn === false && < SignUp parentCallback = {this.handleCallback} />}
         { this.state.form === true  &&  this.state.signIn === true  && < Form email = {this.state.email}/>}
         { this.state.form === false && this.state.signIn === true  && < DisplayRecommendations email={this.state.email}/>}
       </div>

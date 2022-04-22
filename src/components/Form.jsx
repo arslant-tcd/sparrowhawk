@@ -19,18 +19,19 @@ import '../style/Form.css'
 
     // Call API to fetch the song and artists that the user will choose from
     populateSuggestions = async () => {
-
+        /*
         axios
-        .post("http://127.0.0.1:5000/getFormSuggestions", {email: userInput})
+        .post("http://127.0.0.1:5000/getFormSuggestions", {email: this.props.email})
         .then(res => {
         if(res.data['status code'] === "200"){
-            console.log(userInput)
+           // console.log(userInput)
             this.props.parentCallback(res.data.isPresent)
         }
         }).catch((error) => {
         //this.setState({errorMessage: error.message})
             console.log(userInput)
         });
+        */
         
     }
     
@@ -54,7 +55,7 @@ import '../style/Form.css'
                 </div>
                 <div>
                     <div>
-                        <div> {steps}</div>
+                        <div> </div>
                         <button> Submit</button>
                     </div>
                     

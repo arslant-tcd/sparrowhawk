@@ -19,9 +19,14 @@ class SignUp extends React.Component{
         axios
         .post("http://127.0.0.1:5000/addUser", {email: userInput})
         .then(res => {
-        if(res.data['status code'] === "200"){
-            console.log(userInput)
-            this.props.parentCallback(res.data.isPresent)
+            
+        if(res.data.status === "200"){
+            if(res.data.message === "User Added successfully"){
+                this.props.parentCallback(false)
+            }
+            else if(res.data.message === "User Already exists"){
+                this.props.parentCallback(true)
+            }
         }
         }).catch((error) => {
         //this.setState({errorMessage: error.message})

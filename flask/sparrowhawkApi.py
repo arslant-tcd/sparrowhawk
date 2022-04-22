@@ -229,6 +229,38 @@ def getYears():
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
 
+@app.route('/getArtists', methods=['GET'])
+def getArtists():
+    data = pd.read_csv('test.csv')
+    op = []
+    # print(data['artists'])
+    artists = data['artists'].unique()
+    # artists =artists.iloc[:]
+    # print(len(artists))
+    for i in artists:
+        
+        tmp = i.replace("\'", " ")
+        tmp = tmp.replace("[", "")
+        tmp = tmp.replace("]", "")
+        tmp = tmp.split(',')
+        for x in tmp:
+            op.append(x)
+            # print(x)
+        # print(tmp)
+    z = np.array(op)
+    # print()
+    # print(len(op))
+    # print(z)
+    print(len(np.unique(z)))
+    # for data in user.distinct("year"):
+    #     print(data)
+        # op.append({'valence':data['valence'],'year':data['year'],'acousticness':data['acousticness'],'artists':data['artists'],'danceability':data['danceability'],'duration_ms':data['duration_ms'],'energy':data['energy'],'explicit':data['explicit'],'id':data['id'],'instrumentalness':data['instrumentalness'],'key':data['key'],'liveness':data['liveness'],'loudness':data['loudness'],'mode':data['mode'],'name':data['name'],'popularity':data['popularity'],'release_date':data['release_date'],'speechiness':data['speechiness'],'tempo':data['tempo']})
+    response = jsonify({'results' : np.unique(z).tolist()})
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    return response
+
+
+
 @app.route('/recommend/<id>', methods=['GET'])
 @cross_origin()
 def recommend(id):

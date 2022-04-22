@@ -100,6 +100,31 @@ def addLikedSong():
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
 
+@app.route('/removeLikedSong/', methods=['PUT'])
+@cross_origin()
+def removeLikedSong():
+    user = mongo.db.user
+    content = request.get_json(force=True)
+    # print(content)
+    # print(type(content['song']))
+    
+    data = user.count_documents({'email':content['email']})
+    
+    
+    # if()
+    # print(data[0])
+    if(data != 0):
+        print(content['song'])
+        result = user.update_one({'email': content['email']},{'$pull': {'likedSongs':content['song']}})
+        #recalculateAverageScores(content)
+        
+    response = jsonify({'status code' : "200"})
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    return response
+    #result = user.update_one({'email': content['email']}, {'$set':{'avg_valence':avg_valence,'avg_acousticness':avg_acousticness,'avg_danceability':avg_danceability,'avg_energy':avg_energy,'avg_instrumentalness':avg_instrumentalness,'avg_liveness':avg_liveness,'avg_loudness':avg_loudness,'avg_speechiness':avg_speechiness,'avg_tempo':avg_tempo}})  
+
+
+
 @app.route('/getLikedSongs/<mil>', methods=['GET'])
 @cross_origin()
 def getLikedSongs(mil):

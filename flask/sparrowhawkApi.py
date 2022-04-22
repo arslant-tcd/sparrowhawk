@@ -91,6 +91,7 @@ def addLikedSong():
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
 
+
 @app.route('/getLikedSongs/<mil>', methods=['GET'])
 @cross_origin()
 def getLikedSongs(mil):
@@ -202,6 +203,7 @@ def getMusic():
     for data in user.find():
         op.append({'valence':data['valence'],'year':data['year'],'acousticness':data['acousticness'],'artists':data['artists'],'danceability':data['danceability'],'duration_ms':data['duration_ms'],'energy':data['energy'],'explicit':data['explicit'],'id':data['id'],'instrumentalness':data['instrumentalness'],'key':data['key'],'liveness':data['liveness'],'loudness':data['loudness'],'mode':data['mode'],'name':data['name'],'popularity':data['popularity'],'release_date':data['release_date'],'speechiness':data['speechiness'],'tempo':data['tempo']})
     
+
     response = jsonify({'results' : op})
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
@@ -269,6 +271,7 @@ def setPreferences():
     #     # print(list(i)[0])
     # # print(artists)
     # op['artists'] = artists
+
     response = jsonify({'results' : op})
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
@@ -285,6 +288,7 @@ def predict(id):
         df[num_cols] =df[num_cols].apply(pd.to_numeric)
         df_num = df[num_cols]
 
+
         # print(df_num.columns)
 
         # kmeans_model = KMeans(20,init='k-means++')
@@ -294,7 +298,6 @@ def predict(id):
 
         df_num['Cluster'] = kmeans_model.labels_
         result = df_num.merge(df, how='inner', on = num_cols)
-        
         print(result.to_json())
         return result.to_dict()
 

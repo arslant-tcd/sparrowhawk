@@ -3,7 +3,6 @@ import React from 'react';
 import SignUp from './components/SignUp';
 import DisplayRecommendations from './components/DisplayRecommendations';
 import Form from './components/Form';
-import { toHaveDisplayValue } from '@testing-library/jest-dom/dist/matchers';
 
 
 class App extends React.Component {

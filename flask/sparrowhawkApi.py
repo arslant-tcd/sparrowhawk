@@ -1,7 +1,6 @@
 from flask import Flask, jsonify, request
 from flask_pymongo import PyMongo
 from flask_cors import cross_origin
-from bson import ObjectId
 import pickle
 import pymongo
 from sklearn.neighbors import KNeighborsClassifier
@@ -50,7 +49,6 @@ def addUsers():
     print(data[0]['_id'])
     id = data[0]['_id']
     
-
 @app.route('/getUserId/<mil>', methods=['GET'])
 @cross_origin()
 def getUserId(mil):
@@ -86,15 +84,15 @@ def addLikedSong():
         else:
             result = user.update_one({'email': content['email']}, {'$push': {'likedSongs': content['song']}})
             # weighted average code
-            avg_valence = 0.8*data['valence']+0.3*i["avg_valence"]
-            avg_acousticness = 0.8*data["acousticness"]+0.3*i['avg_acousticness']
-            avg_danceability = 0.8*data["danceability"]+0.3*i['avg_danceability']
-            avg_energy = 0.8*data["energy"]+0.3*i['avg_energy']
-            avg_instrumentalness = 0.8*data["instrumentalness"]+0.3*i['avg_instrumentalness']
-            avg_liveness = 0.8*data["liveness"]+0.3*i['avg_liveness']
-            avg_loudness = 0.8*data["loudness"]+0.3*i['avg_loudness']
-            avg_speechiness = 0.8*data["speechiness"]+0.3*i['avg_speechiness']
-            avg_tempo = 0.8*data["tempo"]+0.3*i['avg_tempo']
+            avg_valence = 0.75*data['valence']+0.25*i["avg_valence"]
+            avg_acousticness = 0.75*data["acousticness"]+0.25*i['avg_acousticness']
+            avg_danceability = 0.75*data["danceability"]+0.25*i['avg_danceability']
+            avg_energy = 0.75*data["energy"]+0.25*i['avg_energy']
+            avg_instrumentalness = 0.75*data["instrumentalness"]+0.25*i['avg_instrumentalness']
+            avg_liveness = 0.75*data["liveness"]+0.25*i['avg_liveness']
+            avg_loudness = 0.75*data["loudness"]+0.25*i['avg_loudness']
+            avg_speechiness = 0.75*data["speechiness"]+0.25*i['avg_speechiness']
+            avg_tempo = 0.75*data["tempo"]+0.25*i['avg_tempo']
             result = user.update_one({'email': content['email']}, {'$set':{'avg_valence':avg_valence,'avg_acousticness':avg_acousticness,'avg_danceability':avg_danceability,'avg_energy':avg_energy,'avg_instrumentalness':avg_instrumentalness,'avg_liveness':avg_liveness,'avg_loudness':avg_loudness,'avg_speechiness':avg_speechiness,'avg_tempo':avg_tempo}})
     # data = user.find({'email':mil})    
     # id = data[0]['_id']
@@ -196,7 +194,7 @@ def getBasedOnGenreType(genre_type):
 def getSpecificSong(song_id):
     print(song_id)
     user = mongo.db.music 
-    all_data=user.find({"_id" : ObjectId(str(song_id))})
+    all_data=user.find({"id" : song_id})
     print(all_data)
     op = []
 

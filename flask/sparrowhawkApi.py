@@ -8,6 +8,7 @@ from sklearn.cluster import KMeans
 import numpy as np
 import pandas as pd
 
+
 app = Flask(__name__)
 
 app.config['MONGO_DBNAME'] = 'sparrowhawk'

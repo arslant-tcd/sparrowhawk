@@ -1,7 +1,6 @@
 from flask import Flask, jsonify, request
 from flask_pymongo import PyMongo
 from flask_cors import cross_origin
-from bson import ObjectId
 import pickle
 import pymongo
 from sklearn.neighbors import KNeighborsClassifier
@@ -50,7 +49,6 @@ def addUsers():
     print(data[0]['_id'])
     id = data[0]['_id']
     
-
 @app.route('/getUserId/<mil>', methods=['GET'])
 @cross_origin()
 def getUserId(mil):
@@ -187,7 +185,7 @@ def getBasedOnGenreType(genre_type):
 def getSpecificSong(song_id):
     print(song_id)
     user = mongo.db.music 
-    all_data=user.find({"_id" : ObjectId(str(song_id))})
+    all_data=user.find({"id" : song_id})
     print(all_data)
     op = []
 

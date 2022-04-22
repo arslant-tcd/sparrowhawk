@@ -116,14 +116,36 @@ def removeLikedSong():
     if(data != 0):
         print(content['song'])
         result = user.update_one({'email': content['email']},{'$pull': {'likedSongs':content['song']}})
-        #recalculateAverageScores(content)
+        recalculateAverageScores(content)
         
     response = jsonify({'status code' : "200"})
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
     #result = user.update_one({'email': content['email']}, {'$set':{'avg_valence':avg_valence,'avg_acousticness':avg_acousticness,'avg_danceability':avg_danceability,'avg_energy':avg_energy,'avg_instrumentalness':avg_instrumentalness,'avg_liveness':avg_liveness,'avg_loudness':avg_loudness,'avg_speechiness':avg_speechiness,'avg_tempo':avg_tempo}})  
 
+def recalculateAverageScores(content):
+    user = mongo.db.user
+    existingUser = user.find({'email':content['email']})    
+    songs = existingUser[0]['likedSongs']
+    music = mongo.db.music 
+    for i in songs:
+        print(i)
+        
+        all_data=music.find({"id" : list(i.keys())[0]})
+        print(all_data)
 
+
+    
+    
+
+
+
+    
+    # data = user.find({'email':mil})    
+    # id = data[0]['_id']
+    response = jsonify({'status code' : "200"})
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    return response
 
 @app.route('/getLikedSongs/<mil>', methods=['GET'])
 @cross_origin()

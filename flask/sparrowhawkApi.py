@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 from flask_pymongo import PyMongo
 from flask_cors import cross_origin
 import pickle
+import math
 import pymongo
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.cluster import KMeans
@@ -128,24 +129,37 @@ def recalculateAverageScores(content):
     existingUser = user.find({'email':content['email']})    
     songs = existingUser[0]['likedSongs']
     music = mongo.db.music 
+    song_list=[]
     for i in songs:
         print(i)
         
         all_data=music.find({"id" : list(i.keys())[0]})
-        print(all_data)
-
-
+        for data in all_data:
+            print(data)
+            list_of_features=[data['valence'],data["acousticness"],data["danceability"],data["energy"],data["instrumentalness"],data["liveness"],data["loudness"],data["speechiness"],data["tempo"]]
+            song_list.append(list_of_features)
+            print(song_list)
     
-    
-
-
-
-    
+    new_valence=find_featureVal(0,song_list)
+    print(new_valence)
     # data = user.find({'email':mil})    
     # id = data[0]['_id']
     response = jsonify({'status code' : "200"})
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
+
+def find_featureVal(n,song_list):
+    valence_list= [feature[n] for feature in song_list]
+    print(valence_list)
+    count=0.0
+    total=0.0
+    vals=[]
+    for i in valence_list:
+        count=count+1.0
+        total=float(i)*count
+        vals.append(total)
+    val=math.fsum(vals)/float(sum(range(int(count+1.0))))
+    return val
 
 @app.route('/getLikedSongs/<mil>', methods=['GET'])
 @cross_origin()

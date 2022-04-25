@@ -3,17 +3,17 @@ body {
     
 }
 
-
 .suggestions {
     position: relative;
     display: block;
     margin: auto;
+    width: 100%
 }
 
 .center-div {
     text-align: center;
+    display: inline-block;
 }
-
 
 .submitButton {
     margin: 0;

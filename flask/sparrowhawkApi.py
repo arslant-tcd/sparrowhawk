@@ -261,9 +261,31 @@ def getFormSuggestions():
 @app.route('/setPreferences', methods=['PUT'])
 # @cross_origin()
 def setPreferences():
+    user = mongo.db.user
     content = request.get_json(force=True)
     print(content)
-
+    result = user.find({'email': content['email']})
+    # print(result[0])
+    for i in result:
+        # print("op")
+        # print(i)
+        key ="artists"
+        # df = pd.read_csv('test.csv')
+        # print()
+        # data = df[df['id'] == list(content['song'].keys())[0]].iloc[0]
+        # print(data)
+        # print("Content keys....  ",content.keys())
+        if(key not in i):
+            result = user.update_one({'email': content['email']}, {'$push': {'artists': content['artist']}})
+            return jsonify({'status code':"200", 'message':"Artist Added successfully"})
+        else:
+            if(content['artist'] not in i['artists']):
+                result = user.update_one({'email': content['email']}, {'$push': {'artists': content['artist']}})
+                return jsonify({'status code':"200", 'message':"Artist Added successfully"})
+            else:
+                return jsonify({'status code':"200", 'message':"Artist exists already"})
+        
+        
     # op ={}
     # df = pd.read_csv('test.csv')    
     # cj = df.sample(n = 6)
@@ -278,6 +300,7 @@ def setPreferences():
     #     # print(list(i)[0])
     # # print(artists)
     # op['artists'] = artists
+    
     response = jsonify({'results' : op})
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response

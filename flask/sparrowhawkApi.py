@@ -270,6 +270,7 @@ def setPreferences():
         # print("op")
         # print(i)
         key ="artists"
+        
         # df = pd.read_csv('test.csv')
         # print()
         # data = df[df['id'] == list(content['song'].keys())[0]].iloc[0]
@@ -277,7 +278,9 @@ def setPreferences():
         # print("Content keys....  ",content.keys())
         if(key not in i):
             result = user.update_one({'email': content['email']}, {'$push': {'artists': content['artist']}})
-            return jsonify({'status code':"200", 'message':"Artist Added successfully"})
+            result = user.update_one({'email': content['email']}, {'$push': {'likedSongs': content['song']}})
+            result = user.update_one({'email': content['email']}, {'$set':{'avg_valence':data['valence'],'avg_acousticness':data['acousticness'],'avg_danceability':data['danceability'],'avg_energy':data['energy'],'avg_instrumentalness':data['instrumentalness'],'avg_liveness':data['liveness'],'avg_loudness':data['loudness'],'avg_speechiness':data['speechiness'],'avg_tempo':data['tempo']}})
+            return jsonify({'status code':"200", 'message':"Artist and song Added successfully"})
         else:
             if(content['artist'] not in i['artists']):
                 result = user.update_one({'email': content['email']}, {'$push': {'artists': content['artist']}})

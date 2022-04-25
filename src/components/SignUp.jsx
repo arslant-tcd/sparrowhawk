@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import Form from './Form';
 import '../style/SignUp.css';
 import axios from "axios";
   
@@ -19,13 +18,12 @@ class SignUp extends React.Component{
         axios
         .post("http://127.0.0.1:5000/addUser", {email: userInput})
         .then(res => {
-
-        if(res.data.status === "200"){
+        if(res.data["status code"] === "200"){
             if(res.data.message === "User Added successfully"){
-                this.props.parentCallback(false)
+                this.props.parentCallback(false, userInput)
             }
             else if(res.data.message === "User Already exists"){
-                this.props.parentCallback(true)
+                this.props.parentCallback(true, userInput)
             }
         }
         }).catch((error) => {
@@ -46,9 +44,7 @@ class SignUp extends React.Component{
         return (
             <>
                 <div>
-                    <ul>
-                        <li>Song Search</li>
-                    </ul>
+                    <h2>Song Search</h2> 
                 </div>
                 <div className="center">
                     <form >

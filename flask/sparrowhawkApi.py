@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 from flask_pymongo import PyMongo
 from flask_cors import cross_origin
 import pickle
+import math
 import pymongo
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.cluster import KMeans
@@ -71,26 +72,99 @@ def addLikedSong():
     result = user.find({'email': content['email']})
     # print(result[0])
     for i in result:
-        print("op")
-        print(i)
+        # print("op")
+        # print(i)
         key ="likedSongs"
-        if(key not in content.keys()):
-            df = pd.read_csv('test.csv')
-            print()
-            data = df[df['id'] == list(content['song'].keys())[0]].iloc[0]
-            print(data)
-            
+        df = pd.read_csv('test.csv')
+        # print()
+        data = df[df['id'] == list(content['song'].keys())[0]].iloc[0]
+        print(data)
+        # print("Content keys....  ",content.keys())
+        if(key not in i):
             result = user.update_one({'email': content['email']}, {'$push': {'likedSongs': content['song']}})
             result = user.update_one({'email': content['email']}, {'$set':{'avg_valence':data['valence'],'avg_acousticness':data['acousticness'],'avg_danceability':data['danceability'],'avg_energy':data['energy'],'avg_instrumentalness':data['instrumentalness'],'avg_liveness':data['liveness'],'avg_loudness':data['loudness'],'avg_speechiness':data['speechiness'],'avg_tempo':data['tempo']}})
         else:
-            result = user.update_one({'email': content['email']}, {'$push': {'likedSongs': content['song']}})
-            # weighted average code
-            # result = user.update_one({'email': content['email']}, {'$set':{'avg_valence':data['valence'],'avg_acousticness':data['acousticness'],'avg_danceability':data['danceability'],'avg_energy':data['energy'],'avg_instrumentalness':data['instrumentalness'],'avg_liveness':data['liveness'],'avg_loudness':data['loudness'],'avg_speechiness':data['speechiness'],'avg_tempo':data['tempo']}})
-    # data = user.find({'email':mil})    
-    # id = data[0]['_id']
+            print(i['likedSongs'])
+            likedSongs_ = []
+            for j in i['likedSongs']:
+                likedSongs_.append(list(j.keys())[0])
+            
+            if (list(content['song'].keys())[0] in likedSongs_):
+                return jsonify({'status':"200","message":"Song Already added"})
+            else:
+                result = user.update_one({'email': content['email']}, {'$push': {'likedSongs': content['song']}})
+                
+                new_valence,new_acousticness,new_danceability,new_energy,new_instrumentalness,new_liveness,new_loudness,new_speechiness,new_tempo=recalculateAverageScores(content)
+                result = user.update_one({'email': content['email']}, {'$set':{'avg_valence':new_valence,'avg_acousticness':new_acousticness,'avg_danceability':new_danceability,'avg_energy':new_energy,'avg_instrumentalness':new_instrumentalness,'avg_liveness':new_liveness,'avg_loudness':new_loudness,'avg_speechiness':new_speechiness,'avg_tempo':new_tempo}})
+                
+                response = jsonify({'status code' : "200"})
+                response.headers.add("Access-Control-Allow-Origin", "*")
+                return response
+
+@app.route('/removeLikedSong/', methods=['PUT'])
+@cross_origin()
+def removeLikedSong():
+    user = mongo.db.user
+    content = request.get_json(force=True)
+    # print(content)
+    # print(type(content['song']))
+    
+    data = user.count_documents({'email':content['email']})
+    
+    # if()
+    # print(data[0])
+    if(data != 0):
+        #print(content['song'])
+        result = user.update_one({'email': content['email']},{'$pull': {'likedSongs':content['song']}})
+        new_valence,new_acousticness,new_danceability,new_energy,new_instrumentalness,new_liveness,new_loudness,new_speechiness,new_tempo=recalculateAverageScores(content)
+        
+    result = user.update_one({'email': content['email']}, {'$set':{'avg_valence':new_valence,'avg_acousticness':new_acousticness,'avg_danceability':new_danceability,'avg_energy':new_energy,'avg_instrumentalness':new_instrumentalness,'avg_liveness':new_liveness,'avg_loudness':new_loudness,'avg_speechiness':new_speechiness,'avg_tempo':new_tempo}})  
+    
     response = jsonify({'status code' : "200"})
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
+    
+def recalculateAverageScores(content):
+    user = mongo.db.user
+    existingUser = user.find({'email':content['email']})    
+    songs = existingUser[0]['likedSongs']
+    music = mongo.db.music 
+    song_list=[]
+    for i in songs:
+        #print(i)
+        
+        all_data=music.find({"id" : list(i.keys())[0]})
+        for data in all_data:
+            list_of_features=[data['valence'],data["acousticness"],data["danceability"],data["energy"],data["instrumentalness"],data["liveness"],data["loudness"],data["speechiness"],data["tempo"]]
+            song_list.append(list_of_features)
+            #print(song_list)
+    
+    new_valence=find_featureVal(0,song_list)
+    new_acousticness=find_featureVal(1,song_list)
+    new_danceability=find_featureVal(2,song_list)
+    new_energy=find_featureVal(3,song_list)
+    new_instrumentalness=find_featureVal(4,song_list)
+    new_liveness=find_featureVal(5,song_list)
+    new_loudness=find_featureVal(6,song_list)
+    new_speechiness=find_featureVal(7,song_list)
+    new_tempo=find_featureVal(8,song_list)
+
+    #print(new_tempo)
+    
+    return new_valence,new_acousticness,new_danceability,new_energy,new_instrumentalness,new_liveness,new_loudness,new_speechiness,new_tempo
+
+def find_featureVal(n,song_list):
+    feature_val_list= [feature[n] for feature in song_list]
+    print(feature_val_list)
+    count=0.0
+    total=0.0
+    vals=[]
+    for i in feature_val_list:
+        count=count+1.0
+        total=float(i)*count
+        vals.append(total)
+    val=math.fsum(vals)/float(sum(range(int(count+1.0))))
+    return val
 
 
 @app.route('/getLikedSongs/<mil>', methods=['GET'])
@@ -255,9 +329,31 @@ def getFormSuggestions():
 @app.route('/setPreferences', methods=['PUT'])
 # @cross_origin()
 def setPreferences():
+    user = mongo.db.user
     content = request.get_json(force=True)
     print(content)
-
+    result = user.find({'email': content['email']})
+    # print(result[0])
+    for i in result:
+        # print("op")
+        # print(i)
+        key ="artists"
+        # df = pd.read_csv('test.csv')
+        # print()
+        # data = df[df['id'] == list(content['song'].keys())[0]].iloc[0]
+        # print(data)
+        # print("Content keys....  ",content.keys())
+        if(key not in i):
+            result = user.update_one({'email': content['email']}, {'$push': {'artists': content['artist']}})
+            return jsonify({'status code':"200", 'message':"Artist Added successfully"})
+        else:
+            if(content['artist'] not in i['artists']):
+                result = user.update_one({'email': content['email']}, {'$push': {'artists': content['artist']}})
+                return jsonify({'status code':"200", 'message':"Artist Added successfully"})
+            else:
+                return jsonify({'status code':"200", 'message':"Artist exists already"})
+        
+        
     # op ={}
     # df = pd.read_csv('test.csv')    
     # cj = df.sample(n = 6)
@@ -272,33 +368,31 @@ def setPreferences():
     #     # print(list(i)[0])
     # # print(artists)
     # op['artists'] = artists
-
+    
     response = jsonify({'results' : op})
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
 
-def predict(id):
-        #importing data from csv file
-        # music=GetMusic()
-        # input_data=music.get()
-
-        # df = input_data
-        # df.to_csv('test.csv')
-        df = pd.read_csv('test.csv')
+def predict(user_id):
+        #importing clustered data from csv file
+        data = pd.read_csv('kmeans_result.csv',index_col=False)
         num_cols = ['valence','year','acousticness','danceability','duration_ms','energy','instrumentalness','liveness','loudness','speechiness','tempo']
-        df[num_cols] =df[num_cols].apply(pd.to_numeric)
-        df_num = df[num_cols]
+        data[num_cols] =data[num_cols].apply(pd.to_numeric)
 
+        user = mongo.db.user
+        result = pd.DataFrame(user.find({'email': user_id}))
+        data["diff"]=999.999
+        for i in result:
+            print("Result... ",i,"  Value...  ",result[i])
+        data["diff"]=abs(data["valence"]- result["avg_valence"][0])+abs(data["acousticness"]- result["avg_acousticness"][0])+abs(data["danceability"]- result["avg_danceability"][0])+abs(data["energy"]- result["avg_energy"][0])+abs(data["instrumentalness"]- result["avg_instrumentalness"][0])+abs(data["liveness"]- result["avg_liveness"][0])+abs(data["loudness"]- result["avg_loudness"][0])+abs(data["speechiness"]- result["avg_speechiness"][0])+abs(data["tempo"]- result["avg_tempo"][0])
+        # print("Data columns... ",data.columns)
+        data.sort_values(by=['diff'], ascending=[True])
+        # print("Data head.. ",data.head())
+        # print("Min diff..  ",data['diff'].min())
+        # print("Min Cluster... ",np.array(data[data['diff'] == data['diff'].min()]['Cluster'].sample(1)))
+        closest_cluster = data[data['diff'] == data['diff'].min()]['Cluster'].sample(1).values[0]
 
-        # print(df_num.columns)
-
-        # kmeans_model = KMeans(20,init='k-means++')
-        # kmeans_model.fit(df_num)
-        with open('model_pickle','rb') as f:
-            kmeans_model = pickle.load(f)
-
-        df_num['Cluster'] = kmeans_model.labels_
-        result = df_num.merge(df, how='inner', on = num_cols)
+        result = data.loc[data["Cluster"]==closest_cluster].sample(5)
         print(result.to_json())
         return result.to_dict()
 

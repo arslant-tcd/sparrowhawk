@@ -1,20 +1,57 @@
 import './App.css';
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import React from 'react';
 import SignUp from './components/SignUp';
 import DisplayRecommendations from './components/DisplayRecommendations';
-import { Component } from 'react';
+import Form from './components/Form';
 
-class App extends Component {
+
+class App extends React.Component {
+
+
+  constructor(props){
+    super(props)
+    this.state = {
+      form: false,
+      signIn: false
+    }
+    this.handleCallback = this.handleCallback.bind(this);
+  }
+
+
+  handleCallback = (isUserPresent) => {
+
+    if(isUserPresent === true){
+      this.setState({
+        form: false,
+        signIn: true
+  
+      })
+    }
+    else{
+      this.setState({
+        form: true,
+        signIn: true
+  
+      })
+    }
+  }
+
+  // Handle submits so that existing user is directed to the display recommendations
+  // New users directed to form
   render(){
+
     return (
-      <BrowserRouter>
-        <Routes>
-          <Route path ="/" element={<SignUp/>}/>
-          <Route path="/test" element={<DisplayRecommendations />} />
-        </Routes>
-      </ BrowserRouter>
+           
+      <div>
+        { this.state.form === false && this.state.signIn === false && < SignUp parentCallback = {this.handleCallback} />}
+        { this.state.form === true  &&  this.state.signIn === true  && < Form email = {this.state.email}/>}
+        { this.state.form === false && this.state.signIn === true  && < DisplayRecommendations email={this.state.email}/>}
+      </div>
+    
     );
   }
+
+
     
 }
 

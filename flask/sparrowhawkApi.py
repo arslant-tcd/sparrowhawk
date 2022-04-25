@@ -52,7 +52,7 @@ def addUsers():
     id = data[0]['_id']
     
 @app.route('/getUserId/<mil>', methods=['GET'])
-@cross_origin()
+# @cross_origin()
 def getUserId(mil):
     user = mongo.db.user
     # content = request.get_json(force=True)
@@ -168,7 +168,7 @@ def find_featureVal(n,song_list):
 
 
 @app.route('/getLikedSongs/<mil>', methods=['GET'])
-@cross_origin()
+# @cross_origin()
 def getLikedSongs(mil):
     user = mongo.db.user
     # content = request.get_json(force=True)
@@ -296,7 +296,7 @@ def getYears():
     return response
 
 @app.route('/recommend/<id>', methods=['GET'])
-@cross_origin()
+# @cross_origin()
 def recommend(id):
     # content = request.get_json(force=True)
     print(id)
@@ -311,7 +311,16 @@ def getFormSuggestions():
     op ={}
     df = pd.read_csv('test.csv')    
     cj = df.sample(n = 6)
-    op['songs']=cj[['id','name']].to_dict()
+    kt=cj[['id','name']]
+    
+    kt.reset_index(drop=True)
+    print(kt) 
+    op['songs']=[]
+    
+    for i in zip(cj['id'], cj['name']):
+        songs = {}
+        songs[i[0]] = i[1]
+        op['songs'].append(songs)
     print(op)
     cj = df.sample(n = 6)
     artists =[]

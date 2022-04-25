@@ -71,21 +71,30 @@ def addLikedSong():
     result = user.find({'email': content['email']})
     # print(result[0])
     for i in result:
-        print("op")
-        print(i)
+        # print("op")
+        # print(i)
         key ="likedSongs"
-        if(key not in content.keys()):
-            df = pd.read_csv('test.csv')
-            print()
-            data = df[df['id'] == list(content['song'].keys())[0]].iloc[0]
-            print(data)
-            
+        df = pd.read_csv('test.csv')
+        # print()
+        data = df[df['id'] == list(content['song'].keys())[0]].iloc[0]
+        print(data)
+        # print("Content keys....  ",content.keys())
+        if(key not in i):
             result = user.update_one({'email': content['email']}, {'$push': {'likedSongs': content['song']}})
             result = user.update_one({'email': content['email']}, {'$set':{'avg_valence':data['valence'],'avg_acousticness':data['acousticness'],'avg_danceability':data['danceability'],'avg_energy':data['energy'],'avg_instrumentalness':data['instrumentalness'],'avg_liveness':data['liveness'],'avg_loudness':data['loudness'],'avg_speechiness':data['speechiness'],'avg_tempo':data['tempo']}})
         else:
             result = user.update_one({'email': content['email']}, {'$push': {'likedSongs': content['song']}})
             # weighted average code
-            # result = user.update_one({'email': content['email']}, {'$set':{'avg_valence':data['valence'],'avg_acousticness':data['acousticness'],'avg_danceability':data['danceability'],'avg_energy':data['energy'],'avg_instrumentalness':data['instrumentalness'],'avg_liveness':data['liveness'],'avg_loudness':data['loudness'],'avg_speechiness':data['speechiness'],'avg_tempo':data['tempo']}})
+            avg_valence = 0.75*data['valence']+0.25*i["avg_valence"]
+            avg_acousticness = 0.75*data["acousticness"]+0.25*i['avg_acousticness']
+            avg_danceability = 0.75*data["danceability"]+0.25*i['avg_danceability']
+            avg_energy = 0.75*data["energy"]+0.25*i['avg_energy']
+            avg_instrumentalness = 0.75*data["instrumentalness"]+0.25*i['avg_instrumentalness']
+            avg_liveness = 0.75*data["liveness"]+0.25*i['avg_liveness']
+            avg_loudness = 0.75*data["loudness"]+0.25*i['avg_loudness']
+            avg_speechiness = 0.75*data["speechiness"]+0.25*i['avg_speechiness']
+            avg_tempo = 0.75*data["tempo"]+0.25*i['avg_tempo']
+            result = user.update_one({'email': content['email']}, {'$set':{'avg_valence':avg_valence,'avg_acousticness':avg_acousticness,'avg_danceability':avg_danceability,'avg_energy':avg_energy,'avg_instrumentalness':avg_instrumentalness,'avg_liveness':avg_liveness,'avg_loudness':avg_loudness,'avg_speechiness':avg_speechiness,'avg_tempo':avg_tempo}})
     # data = user.find({'email':mil})    
     # id = data[0]['_id']
     response = jsonify({'status code' : "200"})
@@ -255,9 +264,31 @@ def getFormSuggestions():
 @app.route('/setPreferences', methods=['PUT'])
 # @cross_origin()
 def setPreferences():
+    user = mongo.db.user
     content = request.get_json(force=True)
     print(content)
-
+    result = user.find({'email': content['email']})
+    # print(result[0])
+    for i in result:
+        # print("op")
+        # print(i)
+        key ="artists"
+        # df = pd.read_csv('test.csv')
+        # print()
+        # data = df[df['id'] == list(content['song'].keys())[0]].iloc[0]
+        # print(data)
+        # print("Content keys....  ",content.keys())
+        if(key not in i):
+            result = user.update_one({'email': content['email']}, {'$push': {'artists': content['artist']}})
+            return jsonify({'status code':"200", 'message':"Artist Added successfully"})
+        else:
+            if(content['artist'] not in i['artists']):
+                result = user.update_one({'email': content['email']}, {'$push': {'artists': content['artist']}})
+                return jsonify({'status code':"200", 'message':"Artist Added successfully"})
+            else:
+                return jsonify({'status code':"200", 'message':"Artist exists already"})
+        
+        
     # op ={}
     # df = pd.read_csv('test.csv')    
     # cj = df.sample(n = 6)
@@ -272,33 +303,31 @@ def setPreferences():
     #     # print(list(i)[0])
     # # print(artists)
     # op['artists'] = artists
-
+    
     response = jsonify({'results' : op})
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
 
-def predict(id):
-        #importing data from csv file
-        # music=GetMusic()
-        # input_data=music.get()
-
-        # df = input_data
-        # df.to_csv('test.csv')
-        df = pd.read_csv('test.csv')
+def predict(user_id):
+        #importing clustered data from csv file
+        data = pd.read_csv('kmeans_result.csv',index_col=False)
         num_cols = ['valence','year','acousticness','danceability','duration_ms','energy','instrumentalness','liveness','loudness','speechiness','tempo']
-        df[num_cols] =df[num_cols].apply(pd.to_numeric)
-        df_num = df[num_cols]
+        data[num_cols] =data[num_cols].apply(pd.to_numeric)
 
+        user = mongo.db.user
+        result = pd.DataFrame(user.find({'email': user_id}))
+        data["diff"]=999.999
+        for i in result:
+            print("Result... ",i,"  Value...  ",result[i])
+        data["diff"]=abs(data["valence"]- result["avg_valence"][0])+abs(data["acousticness"]- result["avg_acousticness"][0])+abs(data["danceability"]- result["avg_danceability"][0])+abs(data["energy"]- result["avg_energy"][0])+abs(data["instrumentalness"]- result["avg_instrumentalness"][0])+abs(data["liveness"]- result["avg_liveness"][0])+abs(data["loudness"]- result["avg_loudness"][0])+abs(data["speechiness"]- result["avg_speechiness"][0])+abs(data["tempo"]- result["avg_tempo"][0])
+        # print("Data columns... ",data.columns)
+        data.sort_values(by=['diff'], ascending=[True])
+        # print("Data head.. ",data.head())
+        # print("Min diff..  ",data['diff'].min())
+        # print("Min Cluster... ",np.array(data[data['diff'] == data['diff'].min()]['Cluster'].sample(1)))
+        closest_cluster = data[data['diff'] == data['diff'].min()]['Cluster'].sample(1).values[0]
 
-        # print(df_num.columns)
-
-        # kmeans_model = KMeans(20,init='k-means++')
-        # kmeans_model.fit(df_num)
-        with open('model_pickle','rb') as f:
-            kmeans_model = pickle.load(f)
-
-        df_num['Cluster'] = kmeans_model.labels_
-        result = df_num.merge(df, how='inner', on = num_cols)
+        result = data.loc[data["Cluster"]==closest_cluster].sample(5)
         print(result.to_json())
         return result.to_dict()
 

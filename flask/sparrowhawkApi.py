@@ -327,7 +327,7 @@ def getFormSuggestions():
     return response
 
 @app.route('/setPreferences', methods=['PUT'])
-# @cross_origin()
+@cross_origin()
 def setPreferences():
     user = mongo.db.user
     content = request.get_json(force=True)

@@ -83,23 +83,22 @@ def addLikedSong():
             result = user.update_one({'email': content['email']}, {'$push': {'likedSongs': content['song']}})
             result = user.update_one({'email': content['email']}, {'$set':{'avg_valence':data['valence'],'avg_acousticness':data['acousticness'],'avg_danceability':data['danceability'],'avg_energy':data['energy'],'avg_instrumentalness':data['instrumentalness'],'avg_liveness':data['liveness'],'avg_loudness':data['loudness'],'avg_speechiness':data['speechiness'],'avg_tempo':data['tempo']}})
         else:
-            result = user.update_one({'email': content['email']}, {'$push': {'likedSongs': content['song']}})
-            # weighted average code
-            avg_valence = 0.75*data['valence']+0.25*i["avg_valence"]
-            avg_acousticness = 0.75*data["acousticness"]+0.25*i['avg_acousticness']
-            avg_danceability = 0.75*data["danceability"]+0.25*i['avg_danceability']
-            avg_energy = 0.75*data["energy"]+0.25*i['avg_energy']
-            avg_instrumentalness = 0.75*data["instrumentalness"]+0.25*i['avg_instrumentalness']
-            avg_liveness = 0.75*data["liveness"]+0.25*i['avg_liveness']
-            avg_loudness = 0.75*data["loudness"]+0.25*i['avg_loudness']
-            avg_speechiness = 0.75*data["speechiness"]+0.25*i['avg_speechiness']
-            avg_tempo = 0.75*data["tempo"]+0.25*i['avg_tempo']
-            result = user.update_one({'email': content['email']}, {'$set':{'avg_valence':avg_valence,'avg_acousticness':avg_acousticness,'avg_danceability':avg_danceability,'avg_energy':avg_energy,'avg_instrumentalness':avg_instrumentalness,'avg_liveness':avg_liveness,'avg_loudness':avg_loudness,'avg_speechiness':avg_speechiness,'avg_tempo':avg_tempo}})
-    # data = user.find({'email':mil})    
-    # id = data[0]['_id']
-    response = jsonify({'status code' : "200"})
-    response.headers.add("Access-Control-Allow-Origin", "*")
-    return response
+            print(i['likedSongs'])
+            likedSongs_ = []
+            for j in i['likedSongs']:
+                likedSongs_.append(list(j.keys())[0])
+            
+            if (list(content['song'].keys())[0] in likedSongs_):
+                return jsonify({'status':"200","message":"Song Already added"})
+            else:
+                result = user.update_one({'email': content['email']}, {'$push': {'likedSongs': content['song']}})
+                
+                new_valence,new_acousticness,new_danceability,new_energy,new_instrumentalness,new_liveness,new_loudness,new_speechiness,new_tempo=recalculateAverageScores(content)
+                result = user.update_one({'email': content['email']}, {'$set':{'avg_valence':new_valence,'avg_acousticness':new_acousticness,'avg_danceability':new_danceability,'avg_energy':new_energy,'avg_instrumentalness':new_instrumentalness,'avg_liveness':new_liveness,'avg_loudness':new_loudness,'avg_speechiness':new_speechiness,'avg_tempo':new_tempo}})
+                
+                response = jsonify({'status code' : "200"})
+                response.headers.add("Access-Control-Allow-Origin", "*")
+                return response
 
 @app.route('/removeLikedSong/', methods=['PUT'])
 @cross_origin()
@@ -111,19 +110,19 @@ def removeLikedSong():
     
     data = user.count_documents({'email':content['email']})
     
-    
     # if()
     # print(data[0])
     if(data != 0):
-        print(content['song'])
+        #print(content['song'])
         result = user.update_one({'email': content['email']},{'$pull': {'likedSongs':content['song']}})
-        recalculateAverageScores(content)
+        new_valence,new_acousticness,new_danceability,new_energy,new_instrumentalness,new_liveness,new_loudness,new_speechiness,new_tempo=recalculateAverageScores(content)
         
+    result = user.update_one({'email': content['email']}, {'$set':{'avg_valence':new_valence,'avg_acousticness':new_acousticness,'avg_danceability':new_danceability,'avg_energy':new_energy,'avg_instrumentalness':new_instrumentalness,'avg_liveness':new_liveness,'avg_loudness':new_loudness,'avg_speechiness':new_speechiness,'avg_tempo':new_tempo}})  
+    
     response = jsonify({'status code' : "200"})
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
-    #result = user.update_one({'email': content['email']}, {'$set':{'avg_valence':avg_valence,'avg_acousticness':avg_acousticness,'avg_danceability':avg_danceability,'avg_energy':avg_energy,'avg_instrumentalness':avg_instrumentalness,'avg_liveness':avg_liveness,'avg_loudness':avg_loudness,'avg_speechiness':avg_speechiness,'avg_tempo':avg_tempo}})  
-
+    
 def recalculateAverageScores(content):
     user = mongo.db.user
     existingUser = user.find({'email':content['email']})    
@@ -131,30 +130,35 @@ def recalculateAverageScores(content):
     music = mongo.db.music 
     song_list=[]
     for i in songs:
-        print(i)
+        #print(i)
         
         all_data=music.find({"id" : list(i.keys())[0]})
         for data in all_data:
-            print(data)
             list_of_features=[data['valence'],data["acousticness"],data["danceability"],data["energy"],data["instrumentalness"],data["liveness"],data["loudness"],data["speechiness"],data["tempo"]]
             song_list.append(list_of_features)
-            print(song_list)
+            #print(song_list)
     
     new_valence=find_featureVal(0,song_list)
-    print(new_valence)
-    # data = user.find({'email':mil})    
-    # id = data[0]['_id']
-    response = jsonify({'status code' : "200"})
-    response.headers.add("Access-Control-Allow-Origin", "*")
-    return response
+    new_acousticness=find_featureVal(1,song_list)
+    new_danceability=find_featureVal(2,song_list)
+    new_energy=find_featureVal(3,song_list)
+    new_instrumentalness=find_featureVal(4,song_list)
+    new_liveness=find_featureVal(5,song_list)
+    new_loudness=find_featureVal(6,song_list)
+    new_speechiness=find_featureVal(7,song_list)
+    new_tempo=find_featureVal(8,song_list)
+
+    #print(new_tempo)
+    
+    return new_valence,new_acousticness,new_danceability,new_energy,new_instrumentalness,new_liveness,new_loudness,new_speechiness,new_tempo
 
 def find_featureVal(n,song_list):
-    valence_list= [feature[n] for feature in song_list]
-    print(valence_list)
+    feature_val_list= [feature[n] for feature in song_list]
+    print(feature_val_list)
     count=0.0
     total=0.0
     vals=[]
-    for i in valence_list:
+    for i in feature_val_list:
         count=count+1.0
         total=float(i)*count
         vals.append(total)

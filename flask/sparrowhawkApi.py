@@ -302,5 +302,19 @@ def predict(id):
         print(result.to_json())
         return result.to_dict()
 
+@app.route('/searchDatabase', defaults={'searchString':''})
+@app.route('/searchDatabase/<searchString>', methods=['GET'])
+def searchDatabase(searchString):
+    user = mongo.db.music 
+    all_data=user.find({"name":{"$regex":".*"+searchString+".*", '$options' : 'i'}}).sort('popularity',pymongo.DESCENDING).limit(10)
+    print(all_data)
+    op = []
+
+    for data in all_data:
+        op.append({'name':data['name'],'artists':data['artists']})
+    response = jsonify({'results' : op})
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    return response
+
 if __name__ == '__main__':
     app.run()

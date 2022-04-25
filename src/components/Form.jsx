@@ -29,10 +29,8 @@ import '../style/Form.css'
                 artists: res.data.results.artists,
                 songs: res.data.results.songs
             })
-            //this.props.parentCallback(res.data.isPresent)
         }
         }).catch((error) => {
-        //this.setState({errorMessage: error.message})
             console.log(error)
         });
         
@@ -45,28 +43,18 @@ import '../style/Form.css'
 
     // When artist and song are selected, send Artist and Song ID to backend and update state variables
     handleSubmit = (id, name) => {
-       // this.props.parentCallback(true, this.props.email)
-
+       var songInfo = []
+       songInfo[id] = name
+       console.log(songInfo)
        axios
-       .post("http://127.0.0.1:5000/setPreferences", {email: this.props.email, artist: this.state.selectedArtist, song: { ''+id: name} })
+       .post("http://127.0.0.1:5000/setPreferences", {email: this.props.email, artist: this.state.selectedArtist, song: {songInfo}})
        .then(res => {
        if(res.data["status code"] === "200"){
-           if(res.data.message === "User Added successfully"){
-               this.props.parentCallback(false, userInput)
-           }
-           else if(res.data.message === "User Already exists"){
-               this.props.parentCallback(true, userInput)
-           }
+            this.props.parentCallback(true, this.props.email)
        }
        }).catch((error) => {
-       //this.setState({errorMessage: error.message})
-           console.log(userInput)
+           console.log(error)
        });
-    }
-
-    changeColour = () => {
-       // this.setState({buttonBlack: "black"})
-        //document.documentElement.style.setProperty('--base',this.state.buttonBlack);
     }
 
     handleSongClick = (song) => {
@@ -102,7 +90,7 @@ import '../style/Form.css'
                         <button key={i} className="suggestions" style={{ "backgroundColor": song === this.state.selectedSong ? "blue" : "" }} onClick={(e) => {
                             this.handleSongClick(song)
                         }}>
-                            {artist}
+                            {song}
                         </button>
                     ))}
                 </div>

@@ -43,7 +43,7 @@ def addUsers():
         user.insert_one({'email':content['email']})
         return jsonify({'status code':"200", 'message':"User Added successfully"})
     else:
-        return jsonify({'status':"200","message":"User Already exists"})
+        return jsonify({'status code':"200","message":"User Already exists"})
     # print(content)
     
     # print(str(id))
@@ -64,6 +64,7 @@ def getUserId(mil):
 @app.route('/addLikedSong/', methods=['POST'])
 @cross_origin()
 def addLikedSong():
+
     user = mongo.db.user
     content = request.get_json(force=True)
     # print(content)
@@ -76,7 +77,6 @@ def addLikedSong():
         # print(i)
         key ="likedSongs"
         df = pd.read_csv('test.csv')
-        # print()
         data = df[df['id'] == list(content['song'].keys())[0]].iloc[0]
         print(data)
         # print("Content keys....  ",content.keys())
@@ -408,6 +408,20 @@ def predict(user_id):
         result = data.loc[data["Cluster"]==closest_cluster].sample(5)
         print(result.to_json())
         return result.to_dict()
+
+@app.route('/searchDatabase', defaults={'searchString':''})
+@app.route('/searchDatabase/<searchString>', methods=['GET'])
+def searchDatabase(searchString):
+    user = mongo.db.music 
+    all_data=user.find({"name":{"$regex":".*"+searchString+".*", '$options' : 'i'}}).sort('popularity',pymongo.DESCENDING).limit(10)
+    print(all_data)
+    op = []
+
+    for data in all_data:
+        op.append({'name':data['name'],'artists':data['artists'],'songId':data['id']})
+    response = jsonify({'results' : op})
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    return response
 
 if __name__ == '__main__':
     app.run()

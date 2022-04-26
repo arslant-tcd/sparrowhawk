@@ -312,16 +312,17 @@ def getFormSuggestions():
     op ={}
     df = pd.read_csv('test.csv')    
     cj = df.sample(n = 6)
+
     kt=cj[['id','name']]
     
     kt.reset_index(drop=True)
     print(kt) 
-    op['songs']=dict(zip(cj['id'], cj['name']))
+    op['songs']=[]
     
-    # for i in zip(cj['id'], cj['name']):
-    #     songs = {}
-    #     songs[i[0]] = i[1]
-    #     op['songs'].append(songs)
+    for i in zip(cj['id'], cj['name']):
+        songs = {}
+        songs[i[0]] = i[1]
+        op['songs'].append(songs)
     print(op)
     cj = df.sample(n = 6)
     artists =[]

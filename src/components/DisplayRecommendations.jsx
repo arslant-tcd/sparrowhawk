@@ -32,6 +32,7 @@ class DisplayRecommendations extends React.Component {
 
     // When the page renders we want to retrieve the liked songs and the recommended songs of the user
     componentDidMount = () => {
+        console.log(this.props.email)
         this.getReccommendations();
     }
 

@@ -18,8 +18,7 @@ class DisplayRecommendations extends React.Component {
         this.onSearchBarKeyUp = this.onSearchBarKeyUp.bind(this);
     }
 
-    getLikedSongs (){
-        axios
+    getLikedSongs = async () => await axios
         .get("http://127.0.0.1:5000/getLikedSongs/"+this.props.email)
         .then(res => {
             console.log(res)
@@ -27,8 +26,7 @@ class DisplayRecommendations extends React.Component {
         })
         .catch((error) => {
             console.log("Error retrieving liked songs: " + error)
-        })
-    }
+        });
 
     getReccommendations = async () => await axios
         .get("http://127.0.0.1:5000/getDataByArtist")

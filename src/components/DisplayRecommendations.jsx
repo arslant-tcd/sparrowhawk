@@ -13,15 +13,16 @@ class DisplayRecommendations extends React.Component {
         this.state = {
             email: "",
             likedSongs: [],
+            recommendedSongs: [],
             songs: ""
         }
         this.onSearchBarKeyUp = this.onSearchBarKeyUp.bind(this);
     }
 
     getLikedSongs = async () => await axios
-        .get("http://127.0.0.1:5000/getLikedSongs/"+this.props.email)
+        .get("http://127.0.0.1:5000/getLikedSongs/" + this.props.email)
         .then(res => {
-            console.log(res)
+            console.log("liked songs:" + res);
             this.setState({likedSongs: res.data.likedSongs});
         })
         .catch((error) => {
@@ -29,17 +30,13 @@ class DisplayRecommendations extends React.Component {
         });
 
     getReccommendations = async () => await axios
-        .get("http://127.0.0.1:5000/getDataByArtist")
+        .get("http://127.0.0.1:5000/recommend/" + this.props.email)
         .then(res => {
-            console.log(res.data)
-            this.setState({songs: res.data})
-            if(res.status === "200"){
-                console.log(res);
-                console.log(res.results);
-            }
+            console.log("recommended: " + res.data);
+            this.setState({recommendedSongs: res.data.songs});
             }).catch((error) => {
             //this.setState({errorMessage: error.message})
-                console.log("get Recommendations failed")
+                console.log("get Recommendations failed: " + error)
             });
 
     // When the page renders we want to retrieve the liked songs and the recommended songs of the user
@@ -79,7 +76,8 @@ class DisplayRecommendations extends React.Component {
                             .catch((error) => {
                                 console.log("addLikedSong failed: " + error)
                             });
-                            this.getLikedSongs()
+                            this.getLikedSongs();
+                            this.getReccommendations();
                             
                         }
                         //add search element to list
@@ -122,9 +120,11 @@ class DisplayRecommendations extends React.Component {
                 <div className="recommendations">
                     <h2>Recommendations: </h2>
                     <div className="list">
-                    {this.state.songs.results?.slice(0,10).map((song) => (
-                        <p key={Object.keys(song)}>{Object.values(song)}</p>
-                    ))}
+                        {Object.keys(this.state.recommendedSongs).map((key) => (
+                            <div>
+                            <p key={key}>{Object.values(this.state.recommendedSongs[key])[0]}</p>
+                            </div>
+                        ))}
                     </div>
                 </div>       
             </div>

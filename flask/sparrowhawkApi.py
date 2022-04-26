@@ -61,7 +61,7 @@ def getUserId(mil):
     id = data[0]['_id']
     return jsonify({'id' : str(id)})
     
-@app.route('/addLikedSong/', methods=['PUT'])
+@app.route('/addLikedSong/', methods=['POST'])
 @cross_origin()
 def addLikedSong():
     user = mongo.db.user
@@ -83,6 +83,7 @@ def addLikedSong():
         if(key not in i):
             result = user.update_one({'email': content['email']}, {'$push': {'likedSongs': content['song']}})
             result = user.update_one({'email': content['email']}, {'$set':{'avg_valence':data['valence'],'avg_acousticness':data['acousticness'],'avg_danceability':data['danceability'],'avg_energy':data['energy'],'avg_instrumentalness':data['instrumentalness'],'avg_liveness':data['liveness'],'avg_loudness':data['loudness'],'avg_speechiness':data['speechiness'],'avg_tempo':data['tempo']}})
+            return jsonify({'status':"200","message":"Song added"})
         else:
             print(i['likedSongs'])
             likedSongs_ = []
@@ -98,10 +99,10 @@ def addLikedSong():
                 result = user.update_one({'email': content['email']}, {'$set':{'avg_valence':new_valence,'avg_acousticness':new_acousticness,'avg_danceability':new_danceability,'avg_energy':new_energy,'avg_instrumentalness':new_instrumentalness,'avg_liveness':new_liveness,'avg_loudness':new_loudness,'avg_speechiness':new_speechiness,'avg_tempo':new_tempo}})
                 
                 response = jsonify({'status code' : "200"})
-                response.headers.add("Access-Control-Allow-Origin", "*")
+                # response.headers.add("Access-Control-Allow-Origin", "*")
                 return response
 
-@app.route('/removeLikedSong/', methods=['PUT'])
+@app.route('/removeLikedSong/', methods=['POST'])
 @cross_origin()
 def removeLikedSong():
     user = mongo.db.user
@@ -121,7 +122,7 @@ def removeLikedSong():
     result = user.update_one({'email': content['email']}, {'$set':{'avg_valence':new_valence,'avg_acousticness':new_acousticness,'avg_danceability':new_danceability,'avg_energy':new_energy,'avg_instrumentalness':new_instrumentalness,'avg_liveness':new_liveness,'avg_loudness':new_loudness,'avg_speechiness':new_speechiness,'avg_tempo':new_tempo}})  
     
     response = jsonify({'status code' : "200"})
-    response.headers.add("Access-Control-Allow-Origin", "*")
+    # response.headers.add("Access-Control-Allow-Origin", "*")
     return response
     
 def recalculateAverageScores(content):
@@ -315,12 +316,12 @@ def getFormSuggestions():
     
     kt.reset_index(drop=True)
     print(kt) 
-    op['songs']=[]
+    op['songs']=dict(zip(cj['id'], cj['name']))
     
-    for i in zip(cj['id'], cj['name']):
-        songs = {}
-        songs[i[0]] = i[1]
-        op['songs'].append(songs)
+    # for i in zip(cj['id'], cj['name']):
+    #     songs = {}
+    #     songs[i[0]] = i[1]
+    #     op['songs'].append(songs)
     print(op)
     cj = df.sample(n = 6)
     artists =[]
@@ -335,7 +336,7 @@ def getFormSuggestions():
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
 
-@app.route('/setPreferences', methods=['PUT'])
+@app.route('/setPreferences', methods=['POST'])
 @cross_origin()
 def setPreferences():
     user = mongo.db.user
@@ -348,9 +349,9 @@ def setPreferences():
         # print(i)
         key ="artists"
         
-        # df = pd.read_csv('test.csv')
+        df = pd.read_csv('test.csv')
         # print()
-        # data = df[df['id'] == list(content['song'].keys())[0]].iloc[0]
+        data = df[df['id'] == list(content['song'].keys())[0]].iloc[0]
         # print(data)
         # print("Content keys....  ",content.keys())
         if(key not in i):

@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import '../style/DisplayRecommendations.css';
 import axios from "axios";
 
-
+// This Component should retrieve the liked songs of the User,
+// The recommended songs of the User and the search results from a user query
 class DisplayRecommendations extends React.Component {
 
     constructor(props){
@@ -11,6 +12,9 @@ class DisplayRecommendations extends React.Component {
             songs: ""
         }
     }
+
+
+    
     getReccommendations = async () => await axios
         .get("http://127.0.0.1:5000/getDataByArtist")
         .then(res => {
@@ -26,13 +30,16 @@ class DisplayRecommendations extends React.Component {
             });
           
 
-
+    // When the page renders we want to retrieve the liked songs and the recommended songs of the user
     componentDidMount = () => {
+        console.log(this.props.email)
         this.getReccommendations();
     }
 
-    render(){
 
+
+
+    render(){
         return (
             <>
             <div>

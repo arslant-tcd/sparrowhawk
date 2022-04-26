@@ -12,26 +12,30 @@ class App extends React.Component {
     super(props)
     this.state = {
       form: false,
-      signIn: false
+      signIn: false,
+      email: ""
     }
     this.handleCallback = this.handleCallback.bind(this);
   }
 
-
-  handleCallback = (isUserPresent) => {
+  // Check if user has signup and direct them to the form or out of the form 
+  // Depending on if it is an existing user or not
+  handleCallback = (isUserPresent, email) => {
 
     if(isUserPresent === true){
       this.setState({
         form: false,
-        signIn: true
-  
+        signIn: true,
+        email: email
       })
     }
-    else{
+    else if(isUserPresent === false){
+
+      console.log("Hoping it gets here")
       this.setState({
         form: true,
-        signIn: true
-  
+        signIn: true,
+        email: email
       })
     }
   }
@@ -44,7 +48,7 @@ class App extends React.Component {
            
       <div>
         { this.state.form === false && this.state.signIn === false && < SignUp parentCallback = {this.handleCallback} />}
-        { this.state.form === true  &&  this.state.signIn === true  && < Form email = {this.state.email}/>}
+        { this.state.form === true  &&  this.state.signIn === true  && < Form parentCallback = {this.handleCallback} email = {this.state.email}/>}
         { this.state.form === false && this.state.signIn === true  && < DisplayRecommendations email={this.state.email}/>}
       </div>
     

@@ -18,15 +18,14 @@ class App extends React.Component {
     this.handleCallback = this.handleCallback.bind(this);
   }
 
-  // Check if user has signup and direct them to the form or out of the form 
-  // Depending on if it is an existing user or not
-  handleCallback = (isUserPresent, email) => {
+
+  handleCallback = (isUserPresent,inputEmail) => {
 
     if(isUserPresent === true){
       this.setState({
         form: false,
         signIn: true,
-        email: email
+        email: inputEmail
       })
     }
     else if(isUserPresent === false){
@@ -35,7 +34,8 @@ class App extends React.Component {
       this.setState({
         form: true,
         signIn: true,
-        email: email
+        email: inputEmail
+
       })
     }
   }

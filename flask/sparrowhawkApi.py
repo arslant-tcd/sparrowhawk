@@ -302,7 +302,8 @@ def recommend(id):
     # content = request.get_json(force=True)
     print(id)
     op = predict(id)
-    response = jsonify({'results' : op})
+    print(op)
+    response = jsonify({'songs' : op})
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
 
@@ -407,8 +408,17 @@ def predict(user_id):
         closest_cluster = data[data['diff'] == data['diff'].min()]['Cluster'].sample(1).values[0]
 
         result = data.loc[data["Cluster"]==closest_cluster].sample(5)
-        print(result.to_json())
-        return result.to_dict()
+        kt=result[['id','name']]
+        kt.reset_index(drop=True)
+        print(kt) 
+        op1=[]
+        
+        for i in zip(result['id'], result['name']):
+            songs = {}
+            songs[i[0]] = i[1]
+            op1.append(songs)
+        # print(result.to_json())
+        return op1
 
 @app.route('/searchDatabase', defaults={'searchString':''})
 @app.route('/searchDatabase/<searchString>', methods=['GET'])

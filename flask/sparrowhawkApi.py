@@ -414,7 +414,6 @@ def predict(user_id):
 def searchDatabase(searchString):
     user = mongo.db.music 
     all_data=user.find({"name":{"$regex":".*"+searchString+".*", '$options' : 'i'}}).sort('popularity',pymongo.DESCENDING).limit(10)
-    print(all_data)
     op = []
 
     for data in all_data:

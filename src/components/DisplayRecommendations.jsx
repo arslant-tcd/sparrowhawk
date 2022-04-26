@@ -12,14 +12,28 @@ class DisplayRecommendations extends React.Component {
         super(props)
         this.state = {
             email: "",
+            likedSongs: [],
             songs: ""
         }
         this.onSearchBarKeyUp = this.onSearchBarKeyUp.bind(this);
     }
 
+    getLikedSongs (){
+        axios
+        .get("http://127.0.0.1:5000/getLikedSongs/"+this.props.email)
+        .then(res => {
+            console.log(res)
+            this.setState({likedSongs: res.data.likedSongs});
+        })
+        .catch((error) => {
+            console.log("Error retrieving liked songs: " + error)
+        })
+    }
+
     getReccommendations = async () => await axios
         .get("http://127.0.0.1:5000/getDataByArtist")
         .then(res => {
+            console.log(res.data)
             this.setState({songs: res.data})
             if(res.status === "200"){
                 console.log(res);
@@ -33,12 +47,14 @@ class DisplayRecommendations extends React.Component {
     // When the page renders we want to retrieve the liked songs and the recommended songs of the user
     componentDidMount = () => {
         console.log("component did mount")
-        this.getReccommendations();
+        //this.getReccommendations();
+        this.getLikedSongs();
     }
 
     onSearchBarKeyUp(event) {
         this.searchDatabase(event.target.value);
         event.preventDefault();
+        console.log(this.state.likedSongs)
     }
 
     searchDatabase(searchString) {
@@ -49,6 +65,7 @@ class DisplayRecommendations extends React.Component {
             axios
             .get("http://127.0.0.1:5000/searchDatabase/" + searchString)
             .then(searchResults => {
+                    searchSuggestions.innerHTML = "";
                     for (let currResult of searchResults.data.results){
                         //create new list element
                         let suggestionElement = document.createElement("li");
@@ -58,11 +75,14 @@ class DisplayRecommendations extends React.Component {
                         songIdMap[currResult.songId] = currResult.name
 
                         //add callback when search result is clicked
-                        suggestionElement.onclick = () => {
-                            axios.post("http://127.0.0.1:5000/addLikedSong/",{email: this.props.email, song: songIdMap})
+                        suggestionElement.onclick = async () => {
+                            await axios.post("http://127.0.0.1:5000/addLikedSong/",{email: this.props.email, song: songIdMap})
+                            .then(console.log("onClick"))
                             .catch((error) => {
                                 console.log("addLikedSong failed: " + error)
                             });
+                            this.getLikedSongs()
+                            
                         }
                         //add search element to list
                         searchSuggestions.appendChild(suggestionElement);
@@ -72,9 +92,6 @@ class DisplayRecommendations extends React.Component {
             .catch((error) => {
                 console.log("searchDatabase failed: " + error)
             });
-        }
-        else{
-            
         }
     }
 
@@ -93,23 +110,22 @@ class DisplayRecommendations extends React.Component {
                         />
                     </form>
                 </div>
-                <span>Search Results: </span>
                 <div className="searchResults">
                     <ul class ="searchList" id={SEARCH_SUGGESTIONS_ID}></ul>
                 </div>
-                <div className="likedSongs">
                     <h2>Liked Songs:</h2>
                     <div className="list">
-                    {this.state.songs.results?.slice(0,10).map((song) => (
-                        <p key={song.artists}>{song.artists}</p>
-                    ))}
+                        {Object.keys(this.state.likedSongs).map((key) => (
+                            <div>
+                            <p key={key}>{Object.values(this.state.likedSongs[key])[0]}</p>
+                            </div>
+                        ))}
                     </div>
-                </div>
                 <div className="recommendations">
                     <h2>Recommendations: </h2>
                     <div className="list">
                     {this.state.songs.results?.slice(0,10).map((song) => (
-                        <p key={song.artists}>{song.artists}</p>
+                        <p key={Object.keys(song)}>{Object.values(song)}</p>
                     ))}
                     </div>
                 </div>       

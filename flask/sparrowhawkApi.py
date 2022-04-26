@@ -43,7 +43,7 @@ def addUsers():
         user.insert_one({'email':content['email']})
         return jsonify({'status code':"200", 'message':"User Added successfully"})
     else:
-        return jsonify({'status':"200","message":"User Already exists"})
+        return jsonify({'status code':"200","message":"User Already exists"})
     # print(content)
     
     # print(str(id))
@@ -52,7 +52,7 @@ def addUsers():
     id = data[0]['_id']
     
 @app.route('/getUserId/<mil>', methods=['GET'])
-@cross_origin()
+# @cross_origin()
 def getUserId(mil):
     user = mongo.db.user
     # content = request.get_json(force=True)
@@ -83,9 +83,7 @@ def addLikedSong():
         if(key not in i):
             result = user.update_one({'email': content['email']}, {'$push': {'likedSongs': content['song']}})
             result = user.update_one({'email': content['email']}, {'$set':{'avg_valence':data['valence'],'avg_acousticness':data['acousticness'],'avg_danceability':data['danceability'],'avg_energy':data['energy'],'avg_instrumentalness':data['instrumentalness'],'avg_liveness':data['liveness'],'avg_loudness':data['loudness'],'avg_speechiness':data['speechiness'],'avg_tempo':data['tempo']}})
-            response = jsonify({'status code' : "200"})
-            #response.headers.add("Access-Control-Allow-Origin", "*")
-            return response
+            return jsonify({'status':"200","message":"Song added"})
         else:
             print(i['likedSongs'])
             likedSongs_ = []
@@ -101,10 +99,10 @@ def addLikedSong():
                 result = user.update_one({'email': content['email']}, {'$set':{'avg_valence':new_valence,'avg_acousticness':new_acousticness,'avg_danceability':new_danceability,'avg_energy':new_energy,'avg_instrumentalness':new_instrumentalness,'avg_liveness':new_liveness,'avg_loudness':new_loudness,'avg_speechiness':new_speechiness,'avg_tempo':new_tempo}})
                 
                 response = jsonify({'status code' : "200"})
-                #esponse.headers.add("Access-Control-Allow-Origin", "*")
+                # response.headers.add("Access-Control-Allow-Origin", "*")
                 return response
 
-@app.route('/removeLikedSong/', methods=['PUT'])
+@app.route('/removeLikedSong/', methods=['POST'])
 @cross_origin()
 def removeLikedSong():
     user = mongo.db.user
@@ -124,7 +122,7 @@ def removeLikedSong():
     result = user.update_one({'email': content['email']}, {'$set':{'avg_valence':new_valence,'avg_acousticness':new_acousticness,'avg_danceability':new_danceability,'avg_energy':new_energy,'avg_instrumentalness':new_instrumentalness,'avg_liveness':new_liveness,'avg_loudness':new_loudness,'avg_speechiness':new_speechiness,'avg_tempo':new_tempo}})  
     
     response = jsonify({'status code' : "200"})
-    response.headers.add("Access-Control-Allow-Origin", "*")
+    # response.headers.add("Access-Control-Allow-Origin", "*")
     return response
     
 def recalculateAverageScores(content):
@@ -171,7 +169,7 @@ def find_featureVal(n,song_list):
 
 
 @app.route('/getLikedSongs/<mil>', methods=['GET'])
-@cross_origin()
+# @cross_origin()
 def getLikedSongs(mil):
     user = mongo.db.user
     # content = request.get_json(force=True)
@@ -299,7 +297,7 @@ def getYears():
     return response
 
 @app.route('/recommend/<id>', methods=['GET'])
-@cross_origin()
+# @cross_origin()
 def recommend(id):
     # content = request.get_json(force=True)
     print(id)
@@ -314,7 +312,16 @@ def getFormSuggestions():
     op ={}
     df = pd.read_csv('test.csv')    
     cj = df.sample(n = 6)
-    op['songs']=cj[['id','name']].to_dict()
+    kt=cj[['id','name']]
+    
+    kt.reset_index(drop=True)
+    print(kt) 
+    op['songs']=dict(zip(cj['id'], cj['name']))
+    
+    # for i in zip(cj['id'], cj['name']):
+    #     songs = {}
+    #     songs[i[0]] = i[1]
+    #     op['songs'].append(songs)
     print(op)
     cj = df.sample(n = 6)
     artists =[]
@@ -329,8 +336,8 @@ def getFormSuggestions():
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
 
-@app.route('/setPreferences', methods=['PUT'])
-# @cross_origin()
+@app.route('/setPreferences', methods=['POST'])
+@cross_origin()
 def setPreferences():
     user = mongo.db.user
     content = request.get_json(force=True)
@@ -341,14 +348,17 @@ def setPreferences():
         # print("op")
         # print(i)
         key ="artists"
-        # df = pd.read_csv('test.csv')
+        
+        df = pd.read_csv('test.csv')
         # print()
-        # data = df[df['id'] == list(content['song'].keys())[0]].iloc[0]
+        data = df[df['id'] == list(content['song'].keys())[0]].iloc[0]
         # print(data)
         # print("Content keys....  ",content.keys())
         if(key not in i):
             result = user.update_one({'email': content['email']}, {'$push': {'artists': content['artist']}})
-            return jsonify({'status code':"200", 'message':"Artist Added successfully"})
+            result = user.update_one({'email': content['email']}, {'$push': {'likedSongs': content['song']}})
+            result = user.update_one({'email': content['email']}, {'$set':{'avg_valence':data['valence'],'avg_acousticness':data['acousticness'],'avg_danceability':data['danceability'],'avg_energy':data['energy'],'avg_instrumentalness':data['instrumentalness'],'avg_liveness':data['liveness'],'avg_loudness':data['loudness'],'avg_speechiness':data['speechiness'],'avg_tempo':data['tempo']}})
+            return jsonify({'status code':"200", 'message':"Artist and song Added successfully"})
         else:
             if(content['artist'] not in i['artists']):
                 result = user.update_one({'email': content['email']}, {'$push': {'artists': content['artist']}})

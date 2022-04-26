@@ -4,6 +4,8 @@ import axios from "axios";
 
 const SEARCHBAR_ID = "searchBarId"
 const SEARCH_SUGGESTIONS_ID = "searchResultsId"
+// This Component should retrieve the liked songs of the User,
+// The recommended songs of the User and the search results from a user query
 class DisplayRecommendations extends React.Component {
 
     constructor(props){
@@ -28,10 +30,10 @@ class DisplayRecommendations extends React.Component {
                 console.log("get Recommendations failed")
             });
 
-
+    // When the page renders we want to retrieve the liked songs and the recommended songs of the user
     componentDidMount = () => {
         console.log("component did mount")
-        //this.getReccommendations();
+        this.getReccommendations();
     }
 
     onSearchBarKeyUp(event) {

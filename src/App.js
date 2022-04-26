@@ -28,7 +28,9 @@ class App extends React.Component {
         email: inputEmail
       })
     }
-    else{
+    else if(isUserPresent === false){
+
+      console.log("Hoping it gets here")
       this.setState({
         form: true,
         signIn: true,
@@ -46,7 +48,7 @@ class App extends React.Component {
            
       <div>
         { this.state.form === false && this.state.signIn === false && < SignUp parentCallback = {this.handleCallback} />}
-        { this.state.form === true  &&  this.state.signIn === true  && < Form email = {this.state.email}/>}
+        { this.state.form === true  &&  this.state.signIn === true  && < Form parentCallback = {this.handleCallback} email = {this.state.email}/>}
         { this.state.form === false && this.state.signIn === true  && < DisplayRecommendations email={this.state.email}/>}
       </div>
     

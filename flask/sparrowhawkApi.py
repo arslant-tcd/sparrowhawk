@@ -61,9 +61,10 @@ def getUserId(mil):
     id = data[0]['_id']
     return jsonify({'id' : str(id)})
     
-@app.route('/addLikedSong/', methods=['PUT'])
+@app.route('/addLikedSong/', methods=['POST'])
 @cross_origin()
 def addLikedSong():
+
     user = mongo.db.user
     content = request.get_json(force=True)
     # print(content)
@@ -76,13 +77,15 @@ def addLikedSong():
         # print(i)
         key ="likedSongs"
         df = pd.read_csv('test.csv')
-        # print()
         data = df[df['id'] == list(content['song'].keys())[0]].iloc[0]
         print(data)
         # print("Content keys....  ",content.keys())
         if(key not in i):
             result = user.update_one({'email': content['email']}, {'$push': {'likedSongs': content['song']}})
             result = user.update_one({'email': content['email']}, {'$set':{'avg_valence':data['valence'],'avg_acousticness':data['acousticness'],'avg_danceability':data['danceability'],'avg_energy':data['energy'],'avg_instrumentalness':data['instrumentalness'],'avg_liveness':data['liveness'],'avg_loudness':data['loudness'],'avg_speechiness':data['speechiness'],'avg_tempo':data['tempo']}})
+            response = jsonify({'status code' : "200"})
+            #response.headers.add("Access-Control-Allow-Origin", "*")
+            return response
         else:
             print(i['likedSongs'])
             likedSongs_ = []
@@ -98,7 +101,7 @@ def addLikedSong():
                 result = user.update_one({'email': content['email']}, {'$set':{'avg_valence':new_valence,'avg_acousticness':new_acousticness,'avg_danceability':new_danceability,'avg_energy':new_energy,'avg_instrumentalness':new_instrumentalness,'avg_liveness':new_liveness,'avg_loudness':new_loudness,'avg_speechiness':new_speechiness,'avg_tempo':new_tempo}})
                 
                 response = jsonify({'status code' : "200"})
-                response.headers.add("Access-Control-Allow-Origin", "*")
+                #esponse.headers.add("Access-Control-Allow-Origin", "*")
                 return response
 
 @app.route('/removeLikedSong/', methods=['PUT'])
@@ -405,7 +408,7 @@ def searchDatabase(searchString):
     op = []
 
     for data in all_data:
-        op.append({'name':data['name'],'artists':data['artists']})
+        op.append({'name':data['name'],'artists':data['artists'],'songId':data['id']})
     response = jsonify({'results' : op})
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response

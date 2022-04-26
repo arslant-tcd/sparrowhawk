@@ -12,26 +12,28 @@ class App extends React.Component {
     super(props)
     this.state = {
       form: false,
-      signIn: false
+      signIn: false,
+      email: ""
     }
     this.handleCallback = this.handleCallback.bind(this);
   }
 
 
-  handleCallback = (isUserPresent) => {
+  handleCallback = (isUserPresent,inputEmail) => {
 
     if(isUserPresent === true){
       this.setState({
         form: false,
-        signIn: true
-  
+        signIn: true,
+        email: inputEmail
       })
     }
     else{
       this.setState({
         form: true,
-        signIn: true
-  
+        signIn: true,
+        email: inputEmail
+
       })
     }
   }

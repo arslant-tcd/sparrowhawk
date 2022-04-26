@@ -1,7 +1,7 @@
-.body {
-    padding-bottom: 5px;
+.header {
+    text-align: center;
+    padding: 10px;
 }
-
 
 ul {
     list-style-type: none;
@@ -15,14 +15,6 @@ ul {
     padding: 14px 16px;
     text-decoration: none;
 }
- 
-
-.display {
-    position: absolute;
-    top: 50%;
-    left: 10%;
-    transform: translateY(-50%);
-}
 
 .search input[type=text]{
     position: relative;
@@ -35,8 +27,40 @@ ul {
     background: #f1f1f1;
 }
 
+
+
+
 .list{
     height: 200px;
     overflow: scroll;
     margin: auto;
+}
+
+.searchList{
+    list-style-type: none;
+    overflow: hidden;
+    color: white;
+    background-color: white;
+    text-align: center;
+    text-decoration: none;
+}
+
+.searchResults{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    height:30%;
+    width: 80%;
+    padding: 10px;
+    border: 1px solid grey;
+    overflow: scroll;
+}
+
+.searchElement{
+    background-color: white;
+    color: black;
+}
+
+.searchElement:hover{
+    background-color: wheat;
 }

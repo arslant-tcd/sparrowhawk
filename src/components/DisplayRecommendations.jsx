@@ -9,6 +9,7 @@ class DisplayRecommendations extends React.Component {
     constructor(props){
         super(props)
         this.state = {
+            email: "",
             songs: ""
         }
         this.onSearchBarKeyUp = this.onSearchBarKeyUp.bind(this);
@@ -39,43 +40,46 @@ class DisplayRecommendations extends React.Component {
     }
 
     searchDatabase(searchString) {
+        let searchSuggestions = document.getElementById(SEARCH_SUGGESTIONS_ID);
+        //clear old results
+        searchSuggestions.innerHTML = "";
         if (searchString){
             axios
             .get("http://127.0.0.1:5000/searchDatabase/" + searchString)
             .then(searchResults => {
-                let searchSuggestions = document.getElementById(SEARCH_SUGGESTIONS_ID);
-                searchSuggestions.innerHTML = "";
-                try{
                     for (let currResult of searchResults.data.results){
-                        let li = document.createElement("li");
-                        li.appendChild(document.createTextNode(currResult.name + ", " + currResult.artists));
-                        searchSuggestions.appendChild(li);
+                        //create new list element
+                        let suggestionElement = document.createElement("li");
+                        suggestionElement.appendChild(document.createTextNode(currResult.name + ", " + currResult.artists));
+                        suggestionElement.classList.add("searchElement");
+                        let songIdMap = {};
+                        songIdMap[currResult.songId] = currResult.name
+
+                        //add callback when search result is clicked
+                        suggestionElement.onclick = () => {
+                            axios.post("http://127.0.0.1:5000/addLikedSong/",{email: this.props.email, song: songIdMap})
+                            .catch((error) => {
+                                console.log("addLikedSong failed: " + error)
+                            });
+                        }
+                        //add search element to list
+                        searchSuggestions.appendChild(suggestionElement);
                     }
-                    
-                    
-                    console.log(searchResults.data.results)
                 }
-                catch(TypeError){
-                    //do nothing
-                }
-                
-            })
+            )
             .catch((error) => {
                 console.log("searchDatabase failed: " + error)
             });
         }
+        else{
+            
+        }
     }
 
     render(){
-
         return (
-            <>
-            <div>
-                <ul>
-                    <li>Song Search</li>
-                </ul>
-            </div>
             <div >
+                <div className="header">Song Search</div>
                 <div className="search" >
                     <form>
                         <input
@@ -86,33 +90,28 @@ class DisplayRecommendations extends React.Component {
                             id = {SEARCHBAR_ID}
                         />
                     </form>
-                    <div>
-                    </div>
                 </div>
                 <span>Search Results: </span>
-                <ul id={SEARCH_SUGGESTIONS_ID}></ul>
-                
-                <div className="display">
-                    <div >
-                            <h2>Liked Songs:</h2>
-                            <div className="list">
-                            {this.state.songs.results?.slice(0,10).map((song) => (
-                                 <p key={song.artists}>{song.artists}</p>
-                            ))}
-                            </div>
-                        </div>
-                        <div >
-                            <h2>Recommendations: </h2>
-                            <div className="list">
-                            {this.state.songs.results?.slice(0,10).map((song) => (
-                                 <p key={song.artists}>{song.artists}</p>
-                            ))}
-                            </div>
-                        </div>
+                <div className="searchResults">
+                    <ul class ="searchList" id={SEARCH_SUGGESTIONS_ID}></ul>
+                </div>
+                <div className="likedSongs">
+                    <h2>Liked Songs:</h2>
+                    <div className="list">
+                    {this.state.songs.results?.slice(0,10).map((song) => (
+                        <p key={song.artists}>{song.artists}</p>
+                    ))}
                     </div>
-                    
+                </div>
+                <div className="recommendations">
+                    <h2>Recommendations: </h2>
+                    <div className="list">
+                    {this.state.songs.results?.slice(0,10).map((song) => (
+                        <p key={song.artists}>{song.artists}</p>
+                    ))}
+                    </div>
+                </div>       
             </div>
-            </>
         )
     }
 }

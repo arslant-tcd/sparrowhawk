@@ -23,11 +23,11 @@ import '../style/Form.css'
         .then(res => {
             console.log(res)
         if(res["status"] === 200){
-            console.log(res.data.results.artists)
             this.setState({
                 artists: res.data.results.artists,
                 songs: res.data.results.songs
             })
+            console.log(this.state.songs)
         }
         }).catch((error) => {
             console.log(error)
@@ -40,12 +40,11 @@ import '../style/Form.css'
     }
 
     // When artist and song are selected, send Artist and Song ID to backend and update state variables
-    handleSubmit = (id, name) => {
-       var songInfo = []
-       songInfo[id] = name
-       console.log(songInfo)
+    handleSubmit = (song) => {
+       var obj = {}
+       obj[Object.keys(song)] = Object.values(song)[0]
        axios
-       .put("http://127.0.0.1:5000/setPreferences", {email: this.props.email, artist: this.state.selectedArtist, song: {songInfo}})
+       .post("http://127.0.0.1:5000/setPreferences", {email: this.props.email, artist: this.state.selectedArtist, song: obj})
        .then(res => {
        if(res.data["status code"] === "200"){
             this.props.parentCallback(true, this.props.email)
@@ -54,6 +53,7 @@ import '../style/Form.css'
             console.log(error)
        });
     }
+
     // We highlight the song selected and also change the state variable to be submitted
     handleSongClick = (song) => {
         console.log(song)
@@ -71,6 +71,7 @@ import '../style/Form.css'
                 <div>
                     <h2>Song Search</h2>
                 </div>
+            
                 <div className="center-div">
                     {this.state.artists?.map((artist, i) => (
                         <button key={i} className="suggestions" style={{ "backgroundColor": artist === this.state.selectedArtist ? "red" : "" }} onClick={(e) => {
@@ -82,18 +83,17 @@ import '../style/Form.css'
                 </div>
 
                 <div className="center-div">
-                    {this.state.songs?.map((song, i) => (
+                    {this.state.songs?.map((song,i) => (
                         <button key={i} className="suggestions" style={{ "backgroundColor": song === this.state.selectedSong ? "blue" : "" }} onClick={(e) => {
                             this.handleSongClick(song)
                         }}>
-                            {song}
+                            {Object.values(song)}
                         </button>
                     ))}
                 </div>
                 <div> <button> Other </button></div>
-                <div> <button > Search? </button> </div>
-                <div> <button className="submitButton" onClick={this.handleSubmit(this.state.selectedSong.id, this.state.selectedSong.name)}> Submit </button> </div>
-            </div>
+                <div> <button className="submitButton" onClick={() => this.handleSubmit(this.state.selectedSong)}> Submit </button> </div>
+            </div> 
         )
     }
 }

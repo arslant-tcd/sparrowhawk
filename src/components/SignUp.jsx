@@ -20,9 +20,11 @@ class SignUp extends React.Component{
         .then(res => {
         if(res.data["status code"] === "200"){
             if(res.data.message === "User Added successfully"){
+                console.log("User doesn't exists")
                 this.props.parentCallback(false, userInput)
             }
             else if(res.data.message === "User Already exists"){
+                console.log("User exists")
                 this.props.parentCallback(true, userInput)
             }
         }

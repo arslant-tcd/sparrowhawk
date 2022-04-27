@@ -3,7 +3,25 @@
     padding: 10px;
 }
 
-ul {
+.search input[type=text]{
+    position: relative;
+    left: 10%;
+    padding: 10px;
+    font-size: 17px;
+    border: 1px solid grey;
+    float: left;
+    width: 80%;
+    background: #f1f1f1;
+}
+
+.list-button {
+    position: relative;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-left: 10px;
+}
+
+.my-list {
     list-style-type: none;
     margin: 0;
     padding: 0;
@@ -16,25 +34,11 @@ ul {
     text-decoration: none;
 }
 
-.search input[type=text]{
-    position: relative;
-    left: 10%;
-    padding: 10px;
-    font-size: 17px;
-    border: 1px solid grey;
-    float: left;
-    width: 80%;
-    background: #f1f1f1;
-}
-
-
-
-
 .list{
     height: 200px;
     overflow: scroll;
     margin: auto;
-    display: inline-block;
+    list-style-type: none;
 }
 
 .searchList{

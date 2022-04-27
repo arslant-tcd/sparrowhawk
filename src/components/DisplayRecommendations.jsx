@@ -77,8 +77,7 @@ class DisplayRecommendations extends React.Component {
                                 console.log("addLikedSong failed: " + error)
                             });
                             this.getLikedSongs();
-                            this.getReccommendations();
-                            
+                            this.getReccommendations(); 
                         }
                         //add search element to list
                         searchSuggestions.appendChild(suggestionElement);
@@ -125,11 +124,8 @@ class DisplayRecommendations extends React.Component {
         this.getReccommendations();
     }
 
-
-
-
     render(){
-        return (
+        return (  
             <div >
                 <div className="header">Song Search</div>
                 <div className="search" >
@@ -149,20 +145,22 @@ class DisplayRecommendations extends React.Component {
                     <h2>Liked Songs:</h2>
                     <div className="list">
                         {this.state.likedSongs?.map((song,i) => (
-                            
-                                <p key={i} onClick={() => {this.handleDislike(song)}}>{Object.values(song)[0]}</p>
-                                
-                        
+                            <div>
+                                <li key={i}>
+                                    {Object.values(song)[0]}
+                                    <button className="list-button" onClick={this.handleDislike}>Remove Song</button>
+                                </li>
+                            </div>
                         ))}
                     </div>
                 <div className="recommendations">
                     <h2>Recommendations: </h2>
                     <div className="list">
                         {this.state.recommendedSongs?.map((song,i) => (
-                            <div>
-                                <p key={i} style={{"display":"inline"}}>{Object.values(song)[0]}</p>
-                                <button key={i} onClick={() => {this.handleLike(song)}}>like</button>
-                            </div>
+                            <li key={i}>
+                                {Object.values(song)[0]}
+                                <button className="list-button" onClick={this.handleLike(song)}>Like Song</button>
+                            </li>
                         ))}
                     </div>
                 </div>       

@@ -58,9 +58,7 @@ class SignUp extends React.Component{
                             onChange={e => this.setState({email: e.target.value})}
                         />
                     </form>
-                </div>
-                <div>
-                    <button onClick={this.handleSubmit}> Submit</button>
+                    <button className="signup-button" onClick={this.handleSubmit}> Submit</button>
                 </div>
             </>
         )

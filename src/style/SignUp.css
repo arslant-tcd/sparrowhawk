@@ -12,23 +12,17 @@ h2 {
 }
 
 .center input[type=text]{
-    position: relative;
-    top: 50%;
-    left: 10%;
+    margin: auto;
+    text-align: center;
     padding: 10px;
     font-size: 17px;
     border: 1px solid grey;
-    float: left;
     width: 80%;
     background: #f1f1f1;
 }
 
-button{
-    position: absolute;
-    left: 46%;
-    top: 13.3%;
+.signup-button{
     font-size: 17px;
     border: 1px solid grey;
     padding: 10px 32px;
-  
 }

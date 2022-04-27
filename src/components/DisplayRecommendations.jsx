@@ -41,8 +41,7 @@ class DisplayRecommendations extends React.Component {
 
     // When the page renders we want to retrieve the liked songs and the recommended songs of the user
     componentDidMount = () => {
-        console.log("component did mount")
-        //this.getReccommendations();
+        this.getReccommendations();
         this.getLikedSongs();
     }
 
@@ -92,7 +91,6 @@ class DisplayRecommendations extends React.Component {
     }
 
     handleDislike = (song) => {
-
         axios
         .post("http://127.0.0.1:5000/removeLikedSong/" + song)
         .then(res => {
@@ -121,7 +119,7 @@ class DisplayRecommendations extends React.Component {
 
 
     render(){
-        return (
+        return (  
             <div >
                 <div className="header">Song Search</div>
                 <div className="search" >
@@ -142,8 +140,10 @@ class DisplayRecommendations extends React.Component {
                     <div className="list">
                         {Object.keys(this.state.likedSongs).map((key) => (
                             <div>
-                                <p key={key} style={{"display":"inline"}}>{Object.values(this.state.likedSongs[key])[0]}</p>
-                                <button key={key} onClick={() => {this.handleDislike(key)}}>dislike</button>
+                                <li key={key}>
+                                    {Object.values(this.state.likedSongs[key])[0]}
+                                    <button className="list-button" onClick={this.handleDislike}>Remove Song</button>
+                                </li>
                             </div>
                         ))}
                     </div>
@@ -151,10 +151,10 @@ class DisplayRecommendations extends React.Component {
                     <h2>Recommendations: </h2>
                     <div className="list">
                         {Object.keys(this.state.recommendedSongs).map((key) => (
-                            <div>
-                                <p key={key} style={{"display":"inline"}}>{Object.values(this.state.recommendedSongs[key])[0]}</p>
-                                <button key={key} onClick={() => {this.handleLike(key)}}>like</button>
-                            </div>
+                            <li key={key}>
+                                {Object.values(this.state.recommendedSongs[key])[0]}
+                                <button className="list-button" onClick={this.handleLike}>Like Song</button>
+                            </li>
                         ))}
                     </div>
                 </div>       

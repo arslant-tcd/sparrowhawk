@@ -91,6 +91,35 @@ class DisplayRecommendations extends React.Component {
         }
     }
 
+    handleDislike = (song) => {
+
+        axios
+        .post("http://127.0.0.1:5000/removeLikedSong/" + song)
+        .then(res => {
+            console.log("disliked: " + res.data);
+            this.setState({likedSongs: res.data.songs});
+            }).catch((error) => {
+            //this.setState({errorMessage: error.message})
+                console.log("remove like song failed: " + error)
+            });
+    }
+
+    handleLike = (song) => {
+        
+        axios
+        .post("http://127.0.0.1:5000/addLikedSong/" + song)
+        .then(res => {
+            console.log("liked: " + res.data);
+            this.setState({likedSongs: res.data.songs});
+            }).catch((error) => {
+            //this.setState({errorMessage: error.message})
+                console.log("add liked song failed: " + error)
+            });
+    }
+
+
+
+
     render(){
         return (
             <div >
@@ -107,13 +136,14 @@ class DisplayRecommendations extends React.Component {
                     </form>
                 </div>
                 <div className="searchResults">
-                    <ul class ="searchList" id={SEARCH_SUGGESTIONS_ID}></ul>
+                    <ul className="searchList" id={SEARCH_SUGGESTIONS_ID}></ul>
                 </div>
                     <h2>Liked Songs:</h2>
                     <div className="list">
                         {Object.keys(this.state.likedSongs).map((key) => (
                             <div>
-                            <p key={key}>{Object.values(this.state.likedSongs[key])[0]}</p>
+                                <p key={key} style={{"display":"inline"}}>{Object.values(this.state.likedSongs[key])[0]}</p>
+                                <button key={key} onClick={() => {this.handleDislike(key)}}>dislike</button>
                             </div>
                         ))}
                     </div>
@@ -122,7 +152,8 @@ class DisplayRecommendations extends React.Component {
                     <div className="list">
                         {Object.keys(this.state.recommendedSongs).map((key) => (
                             <div>
-                            <p key={key}>{Object.values(this.state.recommendedSongs[key])[0]}</p>
+                                <p key={key} style={{"display":"inline"}}>{Object.values(this.state.recommendedSongs[key])[0]}</p>
+                                <button key={key} onClick={() => {this.handleLike(key)}}>like</button>
                             </div>
                         ))}
                     </div>

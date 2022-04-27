@@ -345,9 +345,10 @@ def getFormSuggestions():
     print(kt) 
     op['songs']=[]
     
-    for i in zip(cj['id'], cj['name']):
+    for i in zip(cj['id'], cj['name'],cj['artists']):
         songs = {}
         songs[i[0]] = i[1]
+        songs['artists'] = i[2]
         op['songs'].append(songs)
     print(op)
     cj = df.sample(n = 6)

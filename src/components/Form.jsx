@@ -43,6 +43,7 @@ import '../style/Form.css'
     handleSubmit = (song) => {
        var obj = {}
        obj[Object.keys(song)] = Object.values(song)[0]
+       console.log(obj)
        axios
        .post("http://127.0.0.1:5000/setPreferences", {email: this.props.email, artist: this.state.selectedArtist, song: obj})
        .then(res => {

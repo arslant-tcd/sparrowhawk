@@ -172,10 +172,27 @@ def find_featureVal(n,song_list):
 # @cross_origin()
 def getLikedSongs(mil):
     user = mongo.db.user
+    df = pd.read_csv('test.csv')
+
     # content = request.get_json(force=True)
     # print(content)
     data = user.find({'email':mil})    
     id = data[0]['likedSongs']
+    for i in range(len(id)):
+        rs = df[df["id"]==list(id[i].keys())[0]]
+        
+        artists = rs['artists'].iloc[0]
+        
+        song_ = list(id[i].values())[0]
+        song_+=" - "
+        song_+=artists
+        print(list(id[i].keys())[0])
+        k = list(id[i].keys())[0]
+        # print(type(k))
+        id[i][k] = song_
+        print(id[i])
+
+
     response = jsonify({'likedSongs' : id,'status code':"200"})
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response

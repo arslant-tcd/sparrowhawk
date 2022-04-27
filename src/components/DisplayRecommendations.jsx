@@ -34,10 +34,10 @@ class DisplayRecommendations extends React.Component {
         .then(res => {
             console.log("recommended: " + res.data);
             this.setState({recommendedSongs: res.data.songs});
-            }).catch((error) => {
+        }).catch((error) => {
             //this.setState({errorMessage: error.message})
                 console.log("get Recommendations failed: " + error)
-            });
+        });
 
     // When the page renders we want to retrieve the liked songs and the recommended songs of the user
     componentDidMount = () => {
@@ -121,7 +121,7 @@ class DisplayRecommendations extends React.Component {
             //this.setState({errorMessage: error.message})
                 console.log("add liked song failed: " + error)
             });
-        this.getReccommendations();
+        this.getLikedSongs();
     }
 
     render(){
@@ -142,28 +142,26 @@ class DisplayRecommendations extends React.Component {
                 <div className="searchResults">
                     <ul className="searchList" id={SEARCH_SUGGESTIONS_ID}></ul>
                 </div>
-                    <h2>Liked Songs:</h2>
-                    <div className="list">
-                        {this.state.likedSongs?.map((song,i) => (
-                            <div>
-                                <li key={i}>
-                                    {Object.values(song)[0]}
-                                    <button className="list-button" onClick={this.handleDislike}>Remove Song</button>
-                                </li>
-                            </div>
-                        ))}
-                    </div>
-                <div className="recommendations">
-                    <h2>Recommendations: </h2>
-                    <div className="list">
-                        {this.state.recommendedSongs?.map((song,i) => (
+                <h2>Liked Songs:</h2>
+                <div className="list">
+                    {this.state.likedSongs?.map((song,i) => (
+                        <div>
                             <li key={i}>
                                 {Object.values(song)[0]}
-                                <button className="list-button" onClick={this.handleLike(song)}>Like Song</button>
+                                <button className="list-button" onClick={() => this.handleDislike(song)}>Remove Song</button>
                             </li>
-                        ))}
-                    </div>
-                </div>       
+                        </div>
+                    ))}
+                </div>
+                <h2>Recommendations: </h2>
+                <div className="list">
+                    {this.state.recommendedSongs?.map((song,i) => (
+                        <li key={i}>
+                            {Object.values(song)[0]}
+                            <button className="list-button" onClick={() => this.handleLike(song)}>Like Song</button>
+                        </li>
+                     ))}
+                </div>      
             </div>
         )
     }

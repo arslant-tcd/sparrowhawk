@@ -147,7 +147,7 @@ class DisplayRecommendations extends React.Component {
                 <div className="list">
                     {this.state.likedSongs?.map((song,i) => (
                         <li key={i}>
-                            {Object.values(song)[0]}
+                            {Object.values(song)[0]}, {Object.values(song)[1]}
                             <button className="list-button" onClick={() => this.handleDislike(song)}>Remove Song</button>
                         </li>
                     ))}
@@ -156,7 +156,7 @@ class DisplayRecommendations extends React.Component {
                 <div className="list">
                     {this.state.recommendedSongs?.map((song,i) => (
                         <li key={i}>
-                            {Object.values(song)[0]}
+                            {Object.values(song)[0]}, {Object.values(song)[1]}
                             <button className="list-button" onClick={() => this.handleLike(song)}>Like Song</button>
                         </li>
                      ))}

@@ -83,7 +83,9 @@ def addLikedSong():
         if(key not in i):
             result = user.update_one({'email': content['email']}, {'$push': {'likedSongs': content['song']}})
             result = user.update_one({'email': content['email']}, {'$set':{'avg_valence':data['valence'],'avg_acousticness':data['acousticness'],'avg_danceability':data['danceability'],'avg_energy':data['energy'],'avg_instrumentalness':data['instrumentalness'],'avg_liveness':data['liveness'],'avg_loudness':data['loudness'],'avg_speechiness':data['speechiness'],'avg_tempo':data['tempo']}})
-            return jsonify({'status':"200","message":"Song added"})
+            data = user.find({'email':content['email']})    
+            id = data[0]['likedSongs']
+            return jsonify({'status':"200","message":"Song added",'likedSongs': id})
         else:
             print(i['likedSongs'])
             likedSongs_ = []
@@ -91,14 +93,17 @@ def addLikedSong():
                 likedSongs_.append(list(j.keys())[0])
             
             if (list(content['song'].keys())[0] in likedSongs_):
-                return jsonify({'status':"200","message":"Song Already added"})
+                data = user.find({'email':content['email']})    
+                id = data[0]['likedSongs']
+                return jsonify({'status':"200","message":"Song Already added",'likedSongs': id})
             else:
                 result = user.update_one({'email': content['email']}, {'$push': {'likedSongs': content['song']}})
                 
                 new_valence,new_acousticness,new_danceability,new_energy,new_instrumentalness,new_liveness,new_loudness,new_speechiness,new_tempo=recalculateAverageScores(content)
                 result = user.update_one({'email': content['email']}, {'$set':{'avg_valence':new_valence,'avg_acousticness':new_acousticness,'avg_danceability':new_danceability,'avg_energy':new_energy,'avg_instrumentalness':new_instrumentalness,'avg_liveness':new_liveness,'avg_loudness':new_loudness,'avg_speechiness':new_speechiness,'avg_tempo':new_tempo}})
-                
-                response = jsonify({'status code' : "200"})
+                data = user.find({'email':content['email']})    
+                id = data[0]['likedSongs']
+                response = jsonify({'status code' : "200",'likedSongs':id})
                 # response.headers.add("Access-Control-Allow-Origin", "*")
                 return response
 
@@ -120,8 +125,9 @@ def removeLikedSong():
         new_valence,new_acousticness,new_danceability,new_energy,new_instrumentalness,new_liveness,new_loudness,new_speechiness,new_tempo=recalculateAverageScores(content)
         
     result = user.update_one({'email': content['email']}, {'$set':{'avg_valence':new_valence,'avg_acousticness':new_acousticness,'avg_danceability':new_danceability,'avg_energy':new_energy,'avg_instrumentalness':new_instrumentalness,'avg_liveness':new_liveness,'avg_loudness':new_loudness,'avg_speechiness':new_speechiness,'avg_tempo':new_tempo}})  
-    
-    response = jsonify({'status code' : "200"})
+    data = user.find({'email':content['email']})    
+    id = data[0]['likedSongs']
+    response = jsonify({'status code' : "200",'likedSongs':id})
     # response.headers.add("Access-Control-Allow-Origin", "*")
     return response
     

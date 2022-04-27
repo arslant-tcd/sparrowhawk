@@ -19,20 +19,19 @@ class DisplayRecommendations extends React.Component {
         this.onSearchBarKeyUp = this.onSearchBarKeyUp.bind(this);
     }
 
-    getLikedSongs = async () => await axios
+    getLikedSongs = async () => axios
         .get("http://127.0.0.1:5000/getLikedSongs/" + this.props.email)
         .then(res => {
-            console.log("liked songs:" + res);
+            console.log("liked songs:" + res.data.likedSongs);
             this.setState({likedSongs: res.data.likedSongs});
-        })
-        .catch((error) => {
+        }).catch((error) => {
             console.log("Error retrieving liked songs: " + error)
         });
 
-    getReccommendations = async () => await axios
+    getReccommendations = async () => axios
         .get("http://127.0.0.1:5000/recommend/" + this.props.email)
         .then(res => {
-            console.log("recommended: " + res.data);
+            console.log("recommended: " + res.data.songs);
             this.setState({recommendedSongs: res.data.songs});
         }).catch((error) => {
             //this.setState({errorMessage: error.message})
@@ -42,8 +41,9 @@ class DisplayRecommendations extends React.Component {
     // When the page renders we want to retrieve the liked songs and the recommended songs of the user
     componentDidMount = () => {
         console.log("component did mount")
-        this.getReccommendations();
         this.getLikedSongs();
+        this.getReccommendations();
+        
     }
 
     onSearchBarKeyUp(event) {
@@ -100,13 +100,13 @@ class DisplayRecommendations extends React.Component {
         axios
         .post("http://127.0.0.1:5000/removeLikedSong/", {email: this.props.email, song: obj})
         .then(res => {
-            console.log("disliked: " + res.data);
-            this.setState({likedSongs: res.data.songs});
+            console.log("disliked: " + res.data.likedSongs);
+            this.setState({likedSongs: res.data.likedSongs});
             }).catch((error) => {
             //this.setState({errorMessage: error.message})
                 console.log("remove like song failed: " + error)
             });
-        this.getLikedSongs();
+       
     }
 
     handleLike = (song) => {
@@ -115,13 +115,14 @@ class DisplayRecommendations extends React.Component {
         axios
         .post("http://127.0.0.1:5000/addLikedSong/", {email: this.props.email, song: obj})
         .then(res => {
-            console.log("liked: " + res.data);
-            this.setState({likedSongs: res.data.songs});
+            console.log("liked: " + res.data.likedSongs);
+            this.setState({likedSongs: res.data.likedSongs});
             }).catch((error) => {
             //this.setState({errorMessage: error.message})
                 console.log("add liked song failed: " + error)
             });
-        this.getLikedSongs();
+            this.getReccommendations();
+       
     }
 
     render(){
@@ -145,19 +146,17 @@ class DisplayRecommendations extends React.Component {
                 <h2>Liked Songs:</h2>
                 <div className="list">
                     {this.state.likedSongs?.map((song,i) => (
-                        <div>
-                            <li key={i}>
-                                {Object.values(song)[0]}
-                                <button className="list-button" onClick={() => this.handleDislike(song)}>Remove Song</button>
-                            </li>
-                        </div>
+                        <li key={i}>
+                            {Object.values(song)[0]}, {Object.values(song)[1]}
+                            <button className="list-button" onClick={() => this.handleDislike(song)}>Remove Song</button>
+                        </li>
                     ))}
                 </div>
                 <h2>Recommendations: </h2>
                 <div className="list">
                     {this.state.recommendedSongs?.map((song,i) => (
                         <li key={i}>
-                            {Object.values(song)[0]}
+                            {Object.values(song)[0]}, {Object.values(song)[1]}
                             <button className="list-button" onClick={() => this.handleLike(song)}>Like Song</button>
                         </li>
                      ))}

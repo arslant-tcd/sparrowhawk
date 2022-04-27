@@ -178,19 +178,20 @@ def getLikedSongs(mil):
     # print(content)
     data = user.find({'email':mil})    
     id = data[0]['likedSongs']
-    for i in range(len(id)):
-        rs = df[df["id"]==list(id[i].keys())[0]]
+    # for i in range(len(id)):
+    #     rs = df[df["id"]==list(id[i].keys())[0]]
         
-        artists = rs['artists'].iloc[0]
+    #     artists = rs['artists'].iloc[0]
         
-        song_ = list(id[i].values())[0]
-        song_+=" - "
-        song_+=artists
-        print(list(id[i].keys())[0])
-        k = list(id[i].keys())[0]
-        # print(type(k))
-        id[i][k] = song_
-        print(id[i])
+    #     song_ = list(id[i].values())[0]
+    #     song_+=" - "
+    #     song_+=artists
+    #     print(list(id[i].keys())[0])
+    #     k = list(id[i].keys())[0]
+    #     # print(type(k))
+    #     id[i][k] = song_
+    #     print(id[i])
+
 
 
     response = jsonify({'likedSongs' : id,'status code':"200"})

@@ -45,11 +45,8 @@ import { SPORTS, STUDYING } from "./FormElements/OccasionForm";
 
     // When artist and song are selected, send Artist and Song ID to backend and update state variables
     handleSubmit = (song) => {
-       var obj = {}
-       obj[Object.keys(song)] = Object.values(song)[0]
-       console.log(obj)
        axios
-       .post("http://127.0.0.1:5000/setPreferences", {email: this.props.email, artist: this.state.selectedArtist, song: obj})
+       .post("http://127.0.0.1:5000/setPreferences", {email: this.props.email, artist: this.state.selectedArtist, song: song})
        .then(res => {
             if(res.data["status code"] === "200"){
                     this.props.parentCallback(true, this.props.email)
@@ -110,6 +107,7 @@ import { SPORTS, STUDYING } from "./FormElements/OccasionForm";
     
     //update state with passed value
     handleChange = input => e => {
+        console.log(e.target.value)
         this.setState({ [input]: e.target.value });
     };
 

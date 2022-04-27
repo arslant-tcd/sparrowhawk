@@ -363,21 +363,20 @@ def setPreferences():
     content = request.get_json(force=True)
     print(content)
     result = user.find({'email': content['email']})
+
+    songDb = mongo.db.music
+    song=list(songDb.find({"id" : content['song']}))[0]
     # print(result[0])
     for i in result:
         # print("op")
         # print(i)
         key ="artists"
-        
-        df = pd.read_csv('test.csv')
-        # print()
-        data = df[df['id'] == list(content['song'].keys())[0]].iloc[0]
-        # print(data)
-        # print("Content keys....  ",content.keys())
         if(key not in i):
+            songDict = dict()
+            songDict[song['id']] = song['name']
             result = user.update_one({'email': content['email']}, {'$push': {'artists': content['artist']}})
-            result = user.update_one({'email': content['email']}, {'$push': {'likedSongs': content['song']}})
-            result = user.update_one({'email': content['email']}, {'$set':{'avg_valence':data['valence'],'avg_acousticness':data['acousticness'],'avg_danceability':data['danceability'],'avg_energy':data['energy'],'avg_instrumentalness':data['instrumentalness'],'avg_liveness':data['liveness'],'avg_loudness':data['loudness'],'avg_speechiness':data['speechiness'],'avg_tempo':data['tempo']}})
+            result = user.update_one({'email': content['email']}, {'$push': {'likedSongs': songDict}})
+            result = user.update_one({'email': content['email']}, {'$set':{'avg_valence':song['valence'],'avg_acousticness':song['acousticness'],'avg_danceability':song['danceability'],'avg_energy':song['energy'],'avg_instrumentalness':song['instrumentalness'],'avg_liveness':song['liveness'],'avg_loudness':song['loudness'],'avg_speechiness':song['speechiness'],'avg_tempo':song['tempo']}})
             return jsonify({'status code':"200", 'message':"Artist and song Added successfully"})
         else:
             if(content['artist'] not in i['artists']):

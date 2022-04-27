@@ -1,36 +1,40 @@
 import React from "react";
 import axios from "axios";
-import '../style/Form.css'
+import '../style/Form.css';
+import ArtistForm from './FormElements/ArtistForm';
+import SongForm from './FormElements/SongForm';
+import OccasionForm from './FormElements/OccasionForm';
+import { SPORTS, STUDYING } from "./FormElements/OccasionForm";
 
- // Form to display random songs, artists, genres and decades 
- // User will choose preference giving model specific data to user
+// Form to display random songs, artists, genres and decades 
+// User will choose preference giving model specific data to user
+// Took reference from: https://github.com/bradtraversy/react_step_form
  class Form extends React.Component {
-    
     constructor(props){
         super(props)
         this.state = {
+            step: 1,
+            occasion: "",
             songs: [],
             artists: [],
             selectedSong: "",
-            selectedArtist: ""
+            selectedArtist: "",
         }
     }
 
     // Call API to fetch the song and artists that the user will choose from
     populateSuggestions = async () => {
-        axios
+        await axios
         .get("http://127.0.0.1:5000/getFormSuggestions")
         .then(res => {
-            console.log(res)
         if(res["status"] === 200){
             this.setState({
                 artists: res.data.results.artists,
-                songs: res.data.results.songs
             })
-            console.log(this.state.songs)
+            console.log(this.state.artists)
         }
         }).catch((error) => {
-            console.log(error)
+            console.log("Error while populating suggestions: " + error);
         }); 
     }
     
@@ -43,58 +47,122 @@ import '../style/Form.css'
     handleSubmit = (song) => {
        var obj = {}
        obj[Object.keys(song)] = Object.values(song)[0]
+       console.log(obj)
        axios
        .post("http://127.0.0.1:5000/setPreferences", {email: this.props.email, artist: this.state.selectedArtist, song: obj})
        .then(res => {
-       if(res.data["status code"] === "200"){
-            this.props.parentCallback(true, this.props.email)
-       }
-       }).catch((error) => {
-            console.log(error)
-       });
+            if(res.data["status code"] === "200"){
+                    this.props.parentCallback(true, this.props.email)
+            }
+        }).catch((error) => {
+                console.log(error)
+        });
     }
 
     // We highlight the song selected and also change the state variable to be submitted
     handleSongClick = (song) => {
-        console.log(song)
         this.setState({selectedSong: song})
     }
-    // We highlight the artist selected and also change the state variable to be submitted
-    handleArtistClick = (artist) => {
-        console.log(artist)
-        this.setState({selectedArtist: artist})
-    }
+
+    getReccommendations = async () => await axios
+        .get("http://127.0.0.1:5000/recommend/" + this.props.email)
+        .then(res => {
+            console.log("recommended: " + res.data);
+            this.setState({songs: res.data.songs});
+            }).catch((error) => {
+            //this.setState({errorMessage: error.message})
+                console.log("get Recommendations failed: " + error)
+            });
+
+    nextStep = async () => {
+        //update user model after user selected the occasion of the playlist
+        if (this.state.step == 1){
+            console.log(this.props.email)
+            let userParamMap = new Map();
+            if (this.state.occasion == STUDYING.get('name')){
+                userParamMap = STUDYING
+            }
+            else if((this.state.occasion == SPORTS.get('name'))){
+                userParamMap = SPORTS
+            }
+            await axios.post("http://127.0.0.1:5000/updateUserModel/" + this.props.email, {
+                valence: userParamMap.get('valence'),
+                acousticness: userParamMap.get('acousticness'),
+                danceability: userParamMap.get('danceability'),
+                energy: userParamMap.get('energy'),
+                instrumentalness: userParamMap.get('instrumentalness'),
+                liveness: userParamMap.get('liveness'),
+                loudness: userParamMap.get('loudness'),
+                speechiness: userParamMap.get('speechiness'),
+                tempo: userParamMap.get('tempo')
+            })
+            .then(res => {
+                this.getReccommendations();
+            }).catch((error) => {
+                console.log("Error while populating suggestions: " + error);
+            });
+        }
+        const { step } = this.state;
+        this.setState({
+          step: step + 1
+        });
+    };
+    
+    //update state with passed value
+    handleChange = input => e => {
+        this.setState({ [input]: e.target.value });
+    };
 
     render(){
-        return (
-            <div>
-                <div>
-                    <h2>Song Search</h2>
-                </div>
-            
-                <div className="center-div">
-                    {this.state.artists?.map((artist, i) => (
-                        <button key={i} className="suggestions" style={{ "backgroundColor": artist === this.state.selectedArtist ? "red" : "" }} onClick={(e) => {
-                            this.handleArtistClick(artist)
-                        }}>
-                            {artist}
-                        </button>
-                    ))}
-                </div>
+        const { step } = this.state;
+        const { occasion, selectedSong, selectedArtist } = this.state;
+        const values = { occasion, selectedSong, selectedArtist };
 
-                <div className="center-div">
-                    {this.state.songs?.map((song,i) => (
-                        <button key={i} className="suggestions" style={{ "backgroundColor": song === this.state.selectedSong ? "blue" : "" }} onClick={(e) => {
-                            this.handleSongClick(song)
-                        }}>
-                            {Object.values(song)}
-                        </button>
-                    ))}
-                </div>
-                <div> <button> Other </button></div>
-                <div> <button className="submitButton" onClick={() => this.handleSubmit(this.state.selectedSong)}> Submit </button> </div>
-            </div> 
-        )
+        switch (step) {
+        case 1:
+            return (
+            <OccasionForm
+                nextStep={this.nextStep}
+                handleChange={this.handleChange}
+                values={values}
+                state={this.state}
+            />
+            );
+        case 2:
+            return (
+            <ArtistForm
+                nextStep={this.nextStep}
+                handleChange={this.handleChange}
+                values={values}
+                state={this.state}
+            />
+            );
+        case 3:
+            return (
+            <SongForm
+                nextStep={this.nextStep}
+                handleChange={this.handleChange}
+                values={values}
+                state={this.state}
+            />
+            );
+        case 4:
+            //submit and return to main app
+            return (
+                <div>
+                    {console.log(this.state.selectedSong)}
+                    <button className="submitButton" onClick={() => this.handleSubmit(this.state.selectedSong)}>Submit</button> 
+                </div> 
+            )
+        default:
+            //TODO: add failure response
+            return(
+                <div>
+                    An error occured
+                    {console.log("This should not happen")}
+                </div>   
+            )
+        }
     }
 }
 

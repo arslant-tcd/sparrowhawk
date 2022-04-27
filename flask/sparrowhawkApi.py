@@ -438,6 +438,7 @@ def predict(user_id):
         # print(result.to_json())
         return op1
 
+# search database for a song
 @app.route('/searchDatabase', defaults={'searchString':''})
 @app.route('/searchDatabase/<searchString>', methods=['GET'])
 def searchDatabase(searchString):
@@ -450,6 +451,28 @@ def searchDatabase(searchString):
     response = jsonify({'results' : op})
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
+
+# update user model with passed values
+@app.route('/updateUserModel', defaults={'userMail':''})
+@app.route('/updateUserModel/<userMail>', methods=['POST'])
+@cross_origin()
+def updateUserModel(userMail):
+    user = mongo.db.user
+    content = request.get_json(force=True)
+    print(content)
+    user.update_one({'email': userMail}, {'$set':{'avg_valence':content['valence'],
+    'avg_acousticness':content['acousticness'],
+    'avg_danceability':content['danceability'],
+    'avg_energy':content['energy'],
+    'avg_instrumentalness':content['instrumentalness'],
+    'avg_liveness':content['liveness'],
+    'avg_loudness':content['loudness'],
+    'avg_speechiness':content['speechiness'],
+    'avg_tempo':content['tempo']}})
+    response = jsonify({'status code':"200", 'message':"User model updated successfully"})
+    return response
+    #add error handling
+    
 
 if __name__ == '__main__':
     app.run()

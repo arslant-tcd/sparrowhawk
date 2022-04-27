@@ -1,6 +1,7 @@
-body {
-
-    
+.error-message {
+    visibility: hidden;
+    color: red;
+    text-align: center;
 }
 
 .suggestions {
@@ -16,9 +17,8 @@ body {
 }
 
 .submitButton {
-    margin: 0;
+    margin: 30px;
     top: 50%;
-    position: relative;
     text-align: center;
     display: block;
     

@@ -371,21 +371,20 @@ def setPreferences():
     content = request.get_json(force=True)
     print(content)
     result = user.find({'email': content['email']})
+
+    songDb = mongo.db.music
+    song=list(songDb.find({"id" : content['song']}))[0]
     # print(result[0])
     for i in result:
         # print("op")
         # print(i)
         key ="artists"
-        
-        df = pd.read_csv('test.csv')
-        # print()
-        data = df[df['id'] == list(content['song'].keys())[0]].iloc[0]
-        # print(data)
-        # print("Content keys....  ",content.keys())
         if(key not in i):
+            songDict = dict()
+            songDict[song['id']] = song['name']
             result = user.update_one({'email': content['email']}, {'$push': {'artists': content['artist']}})
-            result = user.update_one({'email': content['email']}, {'$push': {'likedSongs': content['song']}})
-            result = user.update_one({'email': content['email']}, {'$set':{'avg_valence':data['valence'],'avg_acousticness':data['acousticness'],'avg_danceability':data['danceability'],'avg_energy':data['energy'],'avg_instrumentalness':data['instrumentalness'],'avg_liveness':data['liveness'],'avg_loudness':data['loudness'],'avg_speechiness':data['speechiness'],'avg_tempo':data['tempo']}})
+            result = user.update_one({'email': content['email']}, {'$push': {'likedSongs': songDict}})
+            result = user.update_one({'email': content['email']}, {'$set':{'avg_valence':song['valence'],'avg_acousticness':song['acousticness'],'avg_danceability':song['danceability'],'avg_energy':song['energy'],'avg_instrumentalness':song['instrumentalness'],'avg_liveness':song['liveness'],'avg_loudness':song['loudness'],'avg_speechiness':song['speechiness'],'avg_tempo':song['tempo']}})
             return jsonify({'status code':"200", 'message':"Artist and song Added successfully"})
         else:
             if(content['artist'] not in i['artists']):
@@ -446,6 +445,7 @@ def predict(user_id):
         # print(result.to_json())
         return op1
 
+# search database for a song
 @app.route('/searchDatabase', defaults={'searchString':''})
 @app.route('/searchDatabase/<searchString>', methods=['GET'])
 def searchDatabase(searchString):
@@ -458,6 +458,28 @@ def searchDatabase(searchString):
     response = jsonify({'results' : op})
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
+
+# update user model with passed values
+@app.route('/updateUserModel', defaults={'userMail':''})
+@app.route('/updateUserModel/<userMail>', methods=['POST'])
+@cross_origin()
+def updateUserModel(userMail):
+    user = mongo.db.user
+    content = request.get_json(force=True)
+    print(content)
+    user.update_one({'email': userMail}, {'$set':{'avg_valence':content['valence'],
+    'avg_acousticness':content['acousticness'],
+    'avg_danceability':content['danceability'],
+    'avg_energy':content['energy'],
+    'avg_instrumentalness':content['instrumentalness'],
+    'avg_liveness':content['liveness'],
+    'avg_loudness':content['loudness'],
+    'avg_speechiness':content['speechiness'],
+    'avg_tempo':content['tempo']}})
+    response = jsonify({'status code':"200", 'message':"User model updated successfully"})
+    return response
+    #add error handling
+    
 
 if __name__ == '__main__':
     app.run()

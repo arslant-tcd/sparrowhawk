@@ -184,10 +184,11 @@ def getLikedSongs(mil):
     # print(content)
     data = user.find({'email':mil})    
     id = data[0]['likedSongs']
-    # for i in range(len(id)):
-    #     rs = df[df["id"]==list(id[i].keys())[0]]
+    for i in range(len(id)):
+        rs = df[df["id"]==list(id[i].keys())[0]]
         
-    #     artists = rs['artists'].iloc[0]
+        artists = rs['artists'].iloc[0]
+        id[i]["artists"] = artists
         
     #     song_ = list(id[i].values())[0]
     #     song_+=" - "
@@ -432,14 +433,14 @@ def predict(user_id):
         closest_cluster = data[data['diff'] == data['diff'].min()]['Cluster'].sample(1).values[0]
 
         result = data.loc[data["Cluster"]==closest_cluster].sample(5)
-        kt=result[['id','name']]
-        kt.reset_index(drop=True)
-        print(kt) 
+        
+        
         op1=[]
         
-        for i in zip(result['id'], result['name']):
+        for i in zip(result['id'], result['name'],result['artists']):
             songs = {}
             songs[i[0]] = i[1]
+            songs['artists'] = i[2]
             op1.append(songs)
         # print(result.to_json())
         return op1

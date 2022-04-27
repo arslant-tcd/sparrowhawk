@@ -19,31 +19,31 @@ class DisplayRecommendations extends React.Component {
         this.onSearchBarKeyUp = this.onSearchBarKeyUp.bind(this);
     }
 
-    getLikedSongs = async () => await axios
+    getLikedSongs = async () => axios
         .get("http://127.0.0.1:5000/getLikedSongs/" + this.props.email)
         .then(res => {
-            console.log("liked songs:" + res);
+            console.log("liked songs:" + res.data.likedSongs);
             this.setState({likedSongs: res.data.likedSongs});
-        })
-        .catch((error) => {
+        }).catch((error) => {
             console.log("Error retrieving liked songs: " + error)
         });
 
-    getReccommendations = async () => await axios
+    getReccommendations = async () => axios
         .get("http://127.0.0.1:5000/recommend/" + this.props.email)
         .then(res => {
-            console.log("recommended: " + res.data);
+            console.log("recommended: " + res.data.songs);
             this.setState({recommendedSongs: res.data.songs});
-            }).catch((error) => {
+        }).catch((error) => {
             //this.setState({errorMessage: error.message})
                 console.log("get Recommendations failed: " + error)
-            });
+        });
 
     // When the page renders we want to retrieve the liked songs and the recommended songs of the user
     componentDidMount = () => {
         console.log("component did mount")
-        //this.getReccommendations();
         this.getLikedSongs();
+        this.getReccommendations();
+        
     }
 
     onSearchBarKeyUp(event) {
@@ -77,8 +77,7 @@ class DisplayRecommendations extends React.Component {
                                 console.log("addLikedSong failed: " + error)
                             });
                             this.getLikedSongs();
-                            this.getReccommendations();
-                            
+                            this.getReccommendations(); 
                         }
                         //add search element to list
                         searchSuggestions.appendChild(suggestionElement);
@@ -91,8 +90,43 @@ class DisplayRecommendations extends React.Component {
         }
     }
 
+    handleDislike = (song) => {
+        var obj = {}
+        obj[Object.keys(song)] = Object.values(song)[0]
+        console.log(this.props.email)
+        console.log(Object.keys(song))
+        console.log(Object.values(song)[0])
+        console.log(obj)
+        axios
+        .post("http://127.0.0.1:5000/removeLikedSong/", {email: this.props.email, song: obj})
+        .then(res => {
+            console.log("disliked: " + res.data.likedSongs);
+            this.setState({likedSongs: res.data.likedSongs});
+            }).catch((error) => {
+            //this.setState({errorMessage: error.message})
+                console.log("remove like song failed: " + error)
+            });
+       
+    }
+
+    handleLike = (song) => {
+        var obj = {}
+        obj[Object.keys(song)] = Object.values(song)[0]
+        axios
+        .post("http://127.0.0.1:5000/addLikedSong/", {email: this.props.email, song: obj})
+        .then(res => {
+            console.log("liked: " + res.data.likedSongs);
+            this.setState({likedSongs: res.data.likedSongs});
+            }).catch((error) => {
+            //this.setState({errorMessage: error.message})
+                console.log("add liked song failed: " + error)
+            });
+            this.getReccommendations();
+       
+    }
+
     render(){
-        return (
+        return (  
             <div >
                 <div className="header">Song Search</div>
                 <div className="search" >
@@ -107,26 +141,26 @@ class DisplayRecommendations extends React.Component {
                     </form>
                 </div>
                 <div className="searchResults">
-                    <ul class ="searchList" id={SEARCH_SUGGESTIONS_ID}></ul>
+                    <ul className="searchList" id={SEARCH_SUGGESTIONS_ID}></ul>
                 </div>
-                    <h2>Liked Songs:</h2>
-                    <div className="list">
-                        {Object.keys(this.state.likedSongs).map((key) => (
-                            <div>
-                            <p key={key}>{Object.values(this.state.likedSongs[key])[0]}</p>
-                            </div>
-                        ))}
-                    </div>
-                <div className="recommendations">
-                    <h2>Recommendations: </h2>
-                    <div className="list">
-                        {Object.keys(this.state.recommendedSongs).map((key) => (
-                            <div>
-                            <p key={key}>{Object.values(this.state.recommendedSongs[key])[0]}</p>
-                            </div>
-                        ))}
-                    </div>
-                </div>       
+                <h2>Liked Songs:</h2>
+                <div className="list">
+                    {this.state.likedSongs?.map((song,i) => (
+                        <li key={i}>
+                            {Object.values(song)[0]}, {Object.values(song)[1]}
+                            <button className="list-button" onClick={() => this.handleDislike(song)}>Remove Song</button>
+                        </li>
+                    ))}
+                </div>
+                <h2>Recommendations: </h2>
+                <div className="list">
+                    {this.state.recommendedSongs?.map((song,i) => (
+                        <li key={i}>
+                            {Object.values(song)[0]}, {Object.values(song)[1]}
+                            <button className="list-button" onClick={() => this.handleLike(song)}>Like Song</button>
+                        </li>
+                     ))}
+                </div>      
             </div>
         )
     }

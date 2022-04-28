@@ -77,6 +77,7 @@ def addLikedSong():
         # print(i)
         key ="likedSongs"
         df = pd.read_csv('test.csv')
+        print(content['song'])
         data = df[df['id'] == list(content['song'].keys())[0]].iloc[0]
         print(data)
         # print("Content keys....  ",content.keys())
@@ -85,6 +86,11 @@ def addLikedSong():
             result = user.update_one({'email': content['email']}, {'$set':{'avg_valence':data['valence'],'avg_acousticness':data['acousticness'],'avg_danceability':data['danceability'],'avg_energy':data['energy'],'avg_instrumentalness':data['instrumentalness'],'avg_liveness':data['liveness'],'avg_loudness':data['loudness'],'avg_speechiness':data['speechiness'],'avg_tempo':data['tempo']}})
             data = user.find({'email':content['email']})    
             id = data[0]['likedSongs']
+            for i in range(len(id)):
+                rs = df[df["id"]==list(id[i].keys())[0]]
+                artists = rs['artists'].iloc[0]
+                id[i]["artists"] = artists
+            
             return jsonify({'status':"200","message":"Song added",'likedSongs': id})
         else:
             print(i['likedSongs'])
@@ -95,6 +101,11 @@ def addLikedSong():
             if (list(content['song'].keys())[0] in likedSongs_):
                 data = user.find({'email':content['email']})    
                 id = data[0]['likedSongs']
+                for i in range(len(id)):
+                    rs = df[df["id"]==list(id[i].keys())[0]]
+                    artists = rs['artists'].iloc[0]
+                    id[i]["artists"] = artists
+            
                 return jsonify({'status':"200","message":"Song Already added",'likedSongs': id})
             else:
                 result = user.update_one({'email': content['email']}, {'$push': {'likedSongs': content['song']}})
@@ -103,6 +114,10 @@ def addLikedSong():
                 result = user.update_one({'email': content['email']}, {'$set':{'avg_valence':new_valence,'avg_acousticness':new_acousticness,'avg_danceability':new_danceability,'avg_energy':new_energy,'avg_instrumentalness':new_instrumentalness,'avg_liveness':new_liveness,'avg_loudness':new_loudness,'avg_speechiness':new_speechiness,'avg_tempo':new_tempo}})
                 data = user.find({'email':content['email']})    
                 id = data[0]['likedSongs']
+                for i in range(len(id)):
+                    rs = df[df["id"]==list(id[i].keys())[0]]
+                    artists = rs['artists'].iloc[0]
+                    id[i]["artists"] = artists
                 response = jsonify({'status code' : "200",'likedSongs':id})
                 # response.headers.add("Access-Control-Allow-Origin", "*")
                 return response
@@ -116,6 +131,9 @@ def removeLikedSong():
     # print(type(content['song']))
     
     data = user.count_documents({'email':content['email']})
+    df = pd.read_csv('test.csv')
+    
+    # data = df[df['id'] == list(content['song'].keys())[0]].iloc[0]
     
     # if()
     # print(data[0])
@@ -127,6 +145,10 @@ def removeLikedSong():
     result = user.update_one({'email': content['email']}, {'$set':{'avg_valence':new_valence,'avg_acousticness':new_acousticness,'avg_danceability':new_danceability,'avg_energy':new_energy,'avg_instrumentalness':new_instrumentalness,'avg_liveness':new_liveness,'avg_loudness':new_loudness,'avg_speechiness':new_speechiness,'avg_tempo':new_tempo}})  
     data = user.find({'email':content['email']})    
     id = data[0]['likedSongs']
+    for i in range(len(id)):
+        rs = df[df["id"]==list(id[i].keys())[0]]
+        artists = rs['artists'].iloc[0]
+        id[i]["artists"] = artists
     response = jsonify({'status code' : "200",'likedSongs':id})
     # response.headers.add("Access-Control-Allow-Origin", "*")
     return response

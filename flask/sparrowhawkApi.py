@@ -411,6 +411,7 @@ def setPreferences():
         else:
             if(content['artist'] not in i['artists']):
                 result = user.update_one({'email': content['email']}, {'$push': {'artists': content['artist']}})
+                result = user.update_one({'email': content['email']}, {'$set':{'avg_valence':song['valence'],'avg_acousticness':song['acousticness'],'avg_danceability':song['danceability'],'avg_energy':song['energy'],'avg_instrumentalness':song['instrumentalness'],'avg_liveness':song['liveness'],'avg_loudness':song['loudness'],'avg_speechiness':song['speechiness'],'avg_tempo':song['tempo']}})
                 return jsonify({'status code':"200", 'message':"Artist Added successfully"})
             else:
                 return jsonify({'status code':"200", 'message':"Artist exists already"})

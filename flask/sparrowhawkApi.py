@@ -395,7 +395,9 @@ def setPreferences():
     result = user.find({'email': content['email']})
 
     songDb = mongo.db.music
+    
     song=list(songDb.find({"id" : content['song']}))[0]
+    print(song)
     # print(result[0])
     for i in result:
         # print("op")
@@ -406,12 +408,14 @@ def setPreferences():
             songDict[song['id']] = song['name']
             result = user.update_one({'email': content['email']}, {'$push': {'artists': content['artist']}})
             result = user.update_one({'email': content['email']}, {'$push': {'likedSongs': songDict}})
-            result = user.update_one({'email': content['email']}, {'$set':{'avg_valence':song['valence'],'avg_acousticness':song['acousticness'],'avg_danceability':song['danceability'],'avg_energy':song['energy'],'avg_instrumentalness':song['instrumentalness'],'avg_liveness':song['liveness'],'avg_loudness':song['loudness'],'avg_speechiness':song['speechiness'],'avg_tempo':song['tempo']}})
+            result = user.update_one({'email': content['email']}, {'$set':{'avg_valence':float(song['valence']),'avg_acousticness':float(song['acousticness']),'avg_danceability':float(song['danceability']),'avg_energy':float(song['energy']),'avg_instrumentalness':float(song['instrumentalness']),'avg_liveness':float(song['liveness']),'avg_loudness':float(song['loudness']),'avg_speechiness':float(song['speechiness']),'avg_tempo':float(song['tempo'])}})
             return jsonify({'status code':"200", 'message':"Artist and song Added successfully"})
         else:
             if(content['artist'] not in i['artists']):
                 result = user.update_one({'email': content['email']}, {'$push': {'artists': content['artist']}})
-                result = user.update_one({'email': content['email']}, {'$set':{'avg_valence':song['valence'],'avg_acousticness':song['acousticness'],'avg_danceability':song['danceability'],'avg_energy':song['energy'],'avg_instrumentalness':song['instrumentalness'],'avg_liveness':song['liveness'],'avg_loudness':song['loudness'],'avg_speechiness':song['speechiness'],'avg_tempo':song['tempo']}})
+                print(type(song['valence']))
+                
+                result = user.update_one({'email': content['email']}, {'$set':{'avg_valence':float(song['valence']),'avg_acousticness':float(song['acousticness']),'avg_danceability':float(song['danceability']),'avg_energy':float(song['energy']),'avg_instrumentalness':float(song['instrumentalness']),'avg_liveness':float(song['liveness']),'avg_loudness':float(song['loudness']),'avg_speechiness':float(song['speechiness']),'avg_tempo':float(song['tempo'])}})
                 return jsonify({'status code':"200", 'message':"Artist Added successfully"})
             else:
                 return jsonify({'status code':"200", 'message':"Artist exists already"})

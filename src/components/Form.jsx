@@ -148,7 +148,7 @@ import { SPORTS, STUDYING } from "./FormElements/OccasionForm";
             //submit and return to main app
             return (
                 <div>
-                    {console.log(this.state.selectedSong)}
+                    {console.log(this.state.selectedSong[0])}
                     <button className="submitButton" onClick={() => this.handleSubmit(this.state.selectedSong)}>Submit</button> 
                 </div> 
             )

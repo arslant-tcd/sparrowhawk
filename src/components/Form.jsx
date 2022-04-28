@@ -133,6 +133,7 @@ import { SPORTS, STUDYING } from "./FormElements/OccasionForm";
                 handleChange={this.handleChange}
                 values={values}
                 state={this.state}
+                populateSuggestions={this.populateSuggestions}
             />
             );
         case 3:
@@ -142,9 +143,12 @@ import { SPORTS, STUDYING } from "./FormElements/OccasionForm";
                 handleChange={this.handleChange}
                 values={values}
                 state={this.state}
+                getReccommendations={this.getReccommendations}
+                handleSubmit={this.handleSubmit}
+                selectedSong={this.state.selectedSong}
             />
-            );
-        case 4:
+            )
+       /* case 4:
             //submit and return to main app
             return (
                 <div>
@@ -152,6 +156,7 @@ import { SPORTS, STUDYING } from "./FormElements/OccasionForm";
                     <button className="submitButton" onClick={() => this.handleSubmit(this.state.selectedSong)}>Submit</button> 
                 </div> 
             )
+            */
         default:
             //TODO: add failure response
             return(

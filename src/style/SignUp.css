@@ -26,3 +26,7 @@ h2 {
     border: 1px solid grey;
     padding: 10px 32px;
 }
+
+.align {
+    text-align: center;
+}

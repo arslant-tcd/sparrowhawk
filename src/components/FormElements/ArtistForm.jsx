@@ -19,9 +19,14 @@ export class ArtistForm extends React.Component {
                     </button>
                 ))}
             </div>
-            <button color="primary" variant="contained" onClick={this.continue}>
-                    Continue
-            </button>
+            <div>
+              <button color="primary" variant="contained" onClick={this.props.populateSuggestions}>
+                  Refresh
+              </button>
+              <button color="primary" variant="contained" onClick={this.continue}>
+                  Continue
+              </button>
+            </div>
        </div>
       );
     }

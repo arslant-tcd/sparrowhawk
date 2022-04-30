@@ -119,39 +119,50 @@ import { SPORTS, STUDYING } from "./FormElements/OccasionForm";
         switch (step) {
         case 1:
             return (
-            <OccasionForm
-                nextStep={this.nextStep}
-                handleChange={this.handleChange}
-                values={values}
-                state={this.state}
-            />
+                <div className="align">
+                <OccasionForm
+                    nextStep={this.nextStep}
+                    handleChange={this.handleChange}
+                    values={values}
+                    state={this.state}
+                />
+                </div>
             );
         case 2:
             return (
-            <ArtistForm
-                nextStep={this.nextStep}
-                handleChange={this.handleChange}
-                values={values}
-                state={this.state}
-            />
+                <div className="align">
+                    <ArtistForm
+                        nextStep={this.nextStep}
+                        handleChange={this.handleChange}
+                        values={values}
+                        state={this.state}
+                        populateSuggestions={this.populateSuggestions}
+                    />
+                </div>
             );
         case 3:
             return (
-            <SongForm
-                nextStep={this.nextStep}
-                handleChange={this.handleChange}
-                values={values}
-                state={this.state}
-            />
-            );
-        case 4:
+                <div className="align">
+                    <SongForm
+                        nextStep={this.nextStep}
+                        handleChange={this.handleChange}
+                        values={values}
+                        state={this.state}
+                        getReccommendations={this.getReccommendations}
+                        handleSubmit={this.handleSubmit}
+                        selectedSong={this.state.selectedSong}
+                    />
+                </div>
+            )
+       /* case 4:
             //submit and return to main app
             return (
                 <div>
-                    {console.log(this.state.selectedSong)}
+                    {console.log(this.state.selectedSong[0])}
                     <button className="submitButton" onClick={() => this.handleSubmit(this.state.selectedSong)}>Submit</button> 
                 </div> 
             )
+            */
         default:
             //TODO: add failure response
             return(

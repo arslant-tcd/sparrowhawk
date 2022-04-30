@@ -48,8 +48,8 @@ class SignUp extends React.Component{
                 <div>
                     <h2>Song Search</h2> 
                 </div>
-                <div className="center">
-                    <form >
+                <div className="align">
+                    <form className="center">
                         <input
                             placeholder='Please input your email'
                             type="text" 
@@ -58,7 +58,9 @@ class SignUp extends React.Component{
                             onChange={e => this.setState({email: e.target.value})}
                         />
                     </form>
-                    <button className="signup-button" onClick={this.handleSubmit}> Submit</button>
+                    <div className="align">
+                        <button className="signup-button" onClick={this.handleSubmit}> Submit</button>
+                    </div>
                 </div>
             </>
         )

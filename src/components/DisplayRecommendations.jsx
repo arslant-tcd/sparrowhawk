@@ -102,6 +102,7 @@ class DisplayRecommendations extends React.Component {
             //this.setState({errorMessage: error.message})
                 console.log("remove like song failed: " + error)
             });
+            this.getReccommendations();
     }
 
     handleLike = (song) => {
